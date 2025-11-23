@@ -1,11 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check SUPABASE_URL and SUPABASE_ANON_KEY in your secrets.');
-}
+// ⚠️ Sustituye estos dos valores por los tuyos reales de Supabase
+const supabaseUrl = "https://ccbwylfznrskbzjcyssj.supabase.co";
+const supabaseAnonKey = "sb_publishable_XCBiJVUAy5CpOpVK8wsxbQ_x-hbBy30";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
