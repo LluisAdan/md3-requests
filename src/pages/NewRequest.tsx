@@ -57,6 +57,26 @@ const NewRequest = () => {
       toast.error('Failed to create request');
       console.error('Error creating request:', error);
     } else {
+      // Trigger external webhook
+      try {
+        await fetch('https://hook.eu2.make.com/5hdkgbq34m0q2w8nab4348s4mr5gkndo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            request_id: data.id,
+            title: data.title,
+            type: data.type,
+            priority: data.priority,
+            created_by: data.created_by,
+          }),
+        });
+      } catch (webhookError) {
+        console.error('Webhook error:', webhookError);
+        // Don't block the user flow if webhook fails
+      }
+
       toast.success('Request created successfully');
       navigate(`/request/${data.id}`);
     }
