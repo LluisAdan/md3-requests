@@ -58,24 +58,6 @@ const NewRequest = () => {
       console.error('Error creating request:', error);
     } else {
       toast.success('Request created successfully');
-      
-      // Trigger webhook after successful creation
-      fetch('https://e2y47f3a7u3mzpw4wafbotxsvifn5or0@hook.eu2.make.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          request_id: data.id,
-          title: data.title,
-          type: data.type,
-          priority: data.priority,
-          created_by: data.created_by,
-        }),
-      }).catch((webhookError) => {
-        console.error('Webhook error:', webhookError);
-      });
-      
       navigate(`/request/${data.id}`);
     }
 
