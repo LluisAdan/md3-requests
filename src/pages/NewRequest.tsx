@@ -58,6 +58,30 @@ const NewRequest = () => {
       console.error('Error creating request:', error);
     } else {
       toast.success('Request created successfully');
+      
+      // Trigger webhook
+      try {
+        await fetch('https://hook.eu2.make.com/5hdkgbq34m0q2w8nab4348s4mr5gkndo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            request_id: data.id,
+            title: data.title,
+            description: data.description,
+            type: data.type,
+            priority: data.priority,
+            created_by: data.created_by,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+          }),
+        });
+      } catch (webhookError) {
+        console.error('Webhook error:', webhookError);
+        // Don't show error to user, just log it
+      }
+      
       navigate(`/request/${data.id}`);
     }
 
