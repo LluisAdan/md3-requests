@@ -26,12 +26,6 @@ const Requests = () => {
 
     let query = supabase.from("requests").select("*").order("created_at", { ascending: false });
 
-    // 🔵 Filtrar por "mis solicitudes"
-    if (view === "mine") {
-      query = query.eq("created_by", user.id);
-    }
-
-    // 🔵 Mantener el filtro por status
     if (statusFilter !== "all") {
       query = query.eq("status", statusFilter);
     }
