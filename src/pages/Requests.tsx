@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
-import { supabase, Request } from '@/lib/supabase';
-import { Layout } from '@/components/Layout';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Link, useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { toast } from 'sonner';
-import { FileText } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { supabase, Request } from "@/lib/supabase";
+import { Layout } from "@/components/Layout";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Link, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import { FileText } from "lucide-react";
 
 const Requests = () => {
   const navigate = useNavigate();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     fetchRequests();
@@ -23,44 +23,56 @@ const Requests = () => {
 
   const fetchRequests = async () => {
     setLoading(true);
-    
-    let query = supabase
-      .from('requests')
-      .select('*')
-      .order('created_at', { ascending: false });
 
-    if (statusFilter !== 'all') {
-      query = query.eq('status', statusFilter);
+    let query = supabase.from("requests").select("*").order("created_at", { ascending: false });
+
+    // 🔵 Filtrar por "mis solicitudes"
+    if (view === "mine") {
+      query = query.eq("created_by", user.id);
+    }
+
+    // 🔵 Mantener el filtro por status
+    if (statusFilter !== "all") {
+      query = query.eq("status", statusFilter);
     }
 
     const { data, error } = await query;
 
     if (error) {
-      toast.error('Failed to fetch requests');
-      console.error('Error fetching requests:', error);
+      toast.error("Failed to fetch requests");
+      console.error("Error fetching requests:", error);
     } else {
       setRequests(data || []);
     }
-    
+
     setLoading(false);
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
-      case 'high': return 'destructive';
-      case 'medium': return 'warning';
-      case 'low': return 'success';
-      default: return 'secondary';
+      case "high":
+        return "destructive";
+      case "medium":
+        return "warning";
+      case "low":
+        return "success";
+      default:
+        return "secondary";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'open': return 'default';
-      case 'in-progress': return 'warning';
-      case 'completed': return 'success';
-      case 'closed': return 'secondary';
-      default: return 'default';
+      case "open":
+        return "default";
+      case "in-progress":
+        return "warning";
+      case "completed":
+        return "success";
+      case "closed":
+        return "secondary";
+      default:
+        return "default";
     }
   };
 
@@ -72,7 +84,7 @@ const Requests = () => {
             <h1 className="text-3xl font-bold text-foreground">All Requests</h1>
             <p className="text-muted-foreground mt-1">View and manage internal requests</p>
           </div>
-          
+
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by status" />
@@ -96,7 +108,7 @@ const Requests = () => {
             <CardContent className="flex flex-col items-center justify-center py-12">
               <FileText className="h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-muted-foreground text-center">
-                {statusFilter === 'all' ? 'No requests found' : `No ${statusFilter} requests found`}
+                {statusFilter === "all" ? "No requests found" : `No ${statusFilter} requests found`}
               </p>
               <Link to="/new">
                 <Button className="mt-4">Create your first request</Button>
@@ -121,10 +133,7 @@ const Requests = () => {
                   {requests.map((request) => (
                     <TableRow key={request.id} className="cursor-pointer group">
                       <TableCell className="font-mono text-sm">
-                        <Link 
-                          to={`/request/${request.id}`}
-                          className="text-primary hover:underline font-semibold"
-                        >
+                        <Link to={`/request/${request.id}`} className="text-primary hover:underline font-semibold">
                           #{request.public_id || request.id.slice(0, 8)}
                         </Link>
                       </TableCell>
@@ -133,7 +142,9 @@ const Requests = () => {
                           {request.title}
                         </Link>
                         <div className="sm:hidden flex flex-wrap gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs">{request.type}</Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {request.type}
+                          </Badge>
                           <Badge variant={getPriorityColor(request.priority)} className="text-xs">
                             {request.priority}
                           </Badge>
@@ -141,7 +152,7 @@ const Requests = () => {
                             {request.status}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
-                            {format(new Date(request.created_at), 'MMM d, yyyy')}
+                            {format(new Date(request.created_at), "MMM d, yyyy")}
                           </span>
                         </div>
                       </TableCell>
@@ -149,17 +160,13 @@ const Requests = () => {
                         <Badge variant="outline">{request.type}</Badge>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        <Badge variant={getPriorityColor(request.priority)}>
-                          {request.priority}
-                        </Badge>
+                        <Badge variant={getPriorityColor(request.priority)}>{request.priority}</Badge>
                       </TableCell>
                       <TableCell className="hidden lg:table-cell">
-                        <Badge variant={getStatusColor(request.status)}>
-                          {request.status}
-                        </Badge>
+                        <Badge variant={getStatusColor(request.status)}>{request.status}</Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground hidden xl:table-cell">
-                        {format(new Date(request.created_at), 'MMM d, yyyy')}
+                        {format(new Date(request.created_at), "MMM d, yyyy")}
                       </TableCell>
                     </TableRow>
                   ))}
