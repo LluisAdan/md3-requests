@@ -5,6 +5,7 @@ import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -16,6 +17,8 @@ const RequestDetail = () => {
   const [request, setRequest] = useState<Request | null>(null);
   const [logs, setLogs] = useState<RequestLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -37,6 +40,7 @@ const RequestDetail = () => {
       navigate('/');
     } else {
       setRequest(data);
+      setSelectedStatus(data?.status || '');
     }
     
     setLoading(false);
@@ -73,6 +77,30 @@ const RequestDetail = () => {
       case 'closed': return 'secondary';
       default: return 'default';
     }
+  };
+
+  const handleUpdateStatus = async () => {
+    if (!request || !selectedStatus) return;
+    
+    setUpdating(true);
+    const { error } = await supabase
+      .from('requests')
+      .update({ 
+        status: selectedStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', request.id);
+
+    if (error) {
+      toast.error('Failed to update status');
+      console.error('Error updating status:', error);
+    } else {
+      toast.success('Status updated successfully');
+      await fetchRequest();
+      await fetchLogs();
+    }
+    
+    setUpdating(false);
   };
 
   if (loading) {
@@ -151,6 +179,32 @@ const RequestDetail = () => {
             <div>
               <h3 className="font-semibold text-lg mb-3">Description</h3>
               <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{request.description}</p>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Update Status</h3>
+              <div className="flex gap-3 items-end">
+                <div className="flex-1 max-w-xs">
+                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="open">Open</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button 
+                  onClick={handleUpdateStatus} 
+                  disabled={updating || selectedStatus === request.status}
+                >
+                  {updating ? 'Updating...' : 'Update Status'}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
