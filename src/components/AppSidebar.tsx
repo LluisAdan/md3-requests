@@ -1,4 +1,4 @@
-import { FileText, Plus } from 'lucide-react';
+import { LayoutDashboard, FileText, Plus } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
   Sidebar,
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sidebar';
 
 const items = [
+  { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
   { title: 'Requests', url: '/', icon: FileText },
   { title: 'New Request', url: '/new', icon: Plus },
 ];

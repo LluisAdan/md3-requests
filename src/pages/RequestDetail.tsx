@@ -100,7 +100,7 @@ const RequestDetail = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
         <Button 
           variant="ghost" 
           onClick={() => navigate('/')}
@@ -110,71 +110,57 @@ const RequestDetail = () => {
           Back to Requests
         </Button>
 
-        <Card>
+        <Card className="shadow-medium">
           <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-3">
-                  {request.public_id && (
-                    <span className="text-sm font-mono text-muted-foreground">
-                      #{request.public_id}
-                    </span>
-                  )}
-                  <Badge variant={getPriorityColor(request.priority)}>
-                    <ArrowUpCircle className="h-3 w-3 mr-1" />
-                    {request.priority}
-                  </Badge>
-                  <Badge variant={getStatusColor(request.status)}>
-                    <Circle className="h-2 w-2 mr-1 fill-current" />
-                    {request.status}
-                  </Badge>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-bold font-mono">
+                  #{request.public_id || request.id.slice(0, 8)}
+                </h1>
+                <Badge variant={getStatusColor(request.status)} className="text-sm px-3 py-1">
+                  {request.status}
+                </Badge>
+              </div>
+              
+              <div className="flex flex-wrap gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Type:</span>
                   <Badge variant="outline">{request.type}</Badge>
                 </div>
-                <CardTitle className="text-2xl">{request.title}</CardTitle>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">Priority:</span>
+                  <Badge variant={getPriorityColor(request.priority)}>
+                    {request.priority}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">Created:</span>
+                  <span className="font-medium">{format(new Date(request.created_at), 'PPP')}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">By:</span>
+                  <span className="font-medium">{request.created_by}</span>
+                </div>
               </div>
             </div>
           </CardHeader>
+          
           <CardContent className="space-y-6">
             <div>
-              <h3 className="font-semibold mb-2">Description</h3>
-              <p className="text-muted-foreground whitespace-pre-wrap">{request.description}</p>
-            </div>
-
-            <Separator />
-
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  <span>Created</span>
-                </div>
-                <p className="font-medium">{format(new Date(request.created_at), 'PPP')}</p>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>Updated</span>
-                </div>
-                <p className="font-medium">{format(new Date(request.updated_at), 'PPP')}</p>
-              </div>
-
-              {request.assigned_to && (
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <User className="h-4 w-4" />
-                    <span>Assigned to</span>
-                  </div>
-                  <p className="font-medium">{request.assigned_to}</p>
-                </div>
-              )}
+              <h3 className="font-semibold text-lg mb-3">Description</h3>
+              <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">{request.description}</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-medium">
           <CardHeader>
-            <CardTitle>Activity Timeline</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Activity / Logs
+            </CardTitle>
             <CardDescription>
               {logs.length === 0 
                 ? 'No activity recorded yet' 
@@ -183,26 +169,42 @@ const RequestDetail = () => {
           </CardHeader>
           {logs.length > 0 && (
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {logs.map((log, index) => (
                   <div key={log.id} className="flex gap-4">
                     <div className="relative flex flex-col items-center">
-                      <div className="h-3 w-3 rounded-full bg-primary" />
+                      <div className="h-3 w-3 rounded-full bg-primary shadow-glow" />
                       {index !== logs.length - 1 && (
                         <div className="flex-1 w-px bg-border mt-2" />
                       )}
                     </div>
                     <div className="flex-1 pb-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="font-medium">{log.event}</p>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-base">{log.event}</p>
+                            <span className="text-xs text-muted-foreground sm:hidden">
+                              {format(new Date(log.created_at), 'MMM d, h:mm a')}
+                            </span>
+                          </div>
                           {log.details && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {JSON.stringify(log.details)}
-                            </p>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              {log.details.public_id && (
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">ID:</span>
+                                  <span className="font-mono">#{log.details.public_id}</span>
+                                </div>
+                              )}
+                              {log.details.source && (
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">Source:</span>
+                                  <span>{log.details.source}</span>
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap ml-4">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:block">
                           {format(new Date(log.created_at), 'MMM d, h:mm a')}
                         </span>
                       </div>

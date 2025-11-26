@@ -104,50 +104,68 @@ const Requests = () => {
             </CardContent>
           </Card>
         ) : (
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {requests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell>
-                      <Link 
-                        to={`/request/${request.id}`}
-                        className="font-mono text-sm text-primary hover:underline cursor-pointer"
-                      >
-                        #{request.public_id || request.id.slice(0, 8)}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="font-medium">{request.title}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{request.type}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getPriorityColor(request.priority)}>
-                        {request.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusColor(request.status)}>
-                        {request.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {format(new Date(request.created_at), 'MMM d, yyyy')}
-                    </TableCell>
+          <Card className="shadow-medium overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="w-[100px]">ID</TableHead>
+                    <TableHead className="min-w-[250px]">Title</TableHead>
+                    <TableHead className="hidden sm:table-cell">Type</TableHead>
+                    <TableHead className="hidden md:table-cell">Priority</TableHead>
+                    <TableHead className="hidden lg:table-cell">Status</TableHead>
+                    <TableHead className="hidden xl:table-cell">Created</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {requests.map((request) => (
+                    <TableRow key={request.id} className="cursor-pointer group">
+                      <TableCell className="font-mono text-sm">
+                        <Link 
+                          to={`/request/${request.id}`}
+                          className="text-primary hover:underline font-semibold"
+                        >
+                          #{request.public_id || request.id.slice(0, 8)}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <Link to={`/request/${request.id}`} className="hover:text-primary transition-colors">
+                          {request.title}
+                        </Link>
+                        <div className="sm:hidden flex flex-wrap gap-2 mt-2">
+                          <Badge variant="outline" className="text-xs">{request.type}</Badge>
+                          <Badge variant={getPriorityColor(request.priority)} className="text-xs">
+                            {request.priority}
+                          </Badge>
+                          <Badge variant={getStatusColor(request.status)} className="text-xs">
+                            {request.status}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(request.created_at), 'MMM d, yyyy')}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Badge variant="outline">{request.type}</Badge>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant={getPriorityColor(request.priority)}>
+                          {request.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <Badge variant={getStatusColor(request.status)}>
+                          {request.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground hidden xl:table-cell">
+                        {format(new Date(request.created_at), 'MMM d, yyyy')}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </Card>
         )}
       </div>
