@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { supabase, Request } from '@/lib/supabase';
 import { Layout } from '@/components/Layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Link } from 'react-router-dom';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Link, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { FileText, Clock, ArrowUpCircle, Circle } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 const Requests = () => {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -47,7 +49,7 @@ const Requests = () => {
     switch (priority.toLowerCase()) {
       case 'high': return 'destructive';
       case 'medium': return 'warning';
-      case 'low': return 'secondary';
+      case 'low': return 'success';
       default: return 'secondary';
     }
   };
@@ -102,48 +104,51 @@ const Requests = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
-            {requests.map((request) => (
-              <Link key={request.id} to={`/request/${request.id}`}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          {request.public_id && (
-                            <span className="text-xs font-mono text-muted-foreground">
-                              #{request.public_id}
-                            </span>
-                          )}
-                          <Badge variant={getPriorityColor(request.priority)}>
-                            <ArrowUpCircle className="h-3 w-3 mr-1" />
-                            {request.priority}
-                          </Badge>
-                          <Badge variant={getStatusColor(request.status)}>
-                            <Circle className="h-2 w-2 mr-1 fill-current" />
-                            {request.status}
-                          </Badge>
-                        </div>
-                        <CardTitle className="text-xl">{request.title}</CardTitle>
-                        <CardDescription className="mt-2 line-clamp-2">
-                          {request.description}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {format(new Date(request.created_at), 'MMM d, yyyy')}
-                      </div>
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Priority</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Created</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {requests.map((request) => (
+                  <TableRow key={request.id}>
+                    <TableCell>
+                      <Link 
+                        to={`/request/${request.id}`}
+                        className="font-mono text-sm text-primary hover:underline cursor-pointer"
+                      >
+                        #{request.public_id || request.id.slice(0, 8)}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="font-medium">{request.title}</TableCell>
+                    <TableCell>
                       <Badge variant="outline">{request.type}</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getPriorityColor(request.priority)}>
+                        {request.priority}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusColor(request.status)}>
+                        {request.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {format(new Date(request.created_at), 'MMM d, yyyy')}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         )}
       </div>
     </Layout>
