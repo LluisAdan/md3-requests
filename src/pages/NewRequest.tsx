@@ -90,37 +90,38 @@ const NewRequest = () => {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground">Create New Request</h1>
-          <p className="text-muted-foreground mt-1">Submit a new internal request</p>
+      <div className="w-full max-w-2xl mx-auto">
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Create New Request</h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-1">Submit a new internal request</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+              <Plus className="h-4 w-4 md:h-5 md:w-5" />
               Request Details
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               Fill in the information below to create your request
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
+                <Label htmlFor="title" className="text-sm">Title *</Label>
                 <Input
                   id="title"
                   placeholder="Brief description of your request"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   required
+                  className="text-sm"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description *</Label>
+                <Label htmlFor="description" className="text-sm">Description *</Label>
                 <Textarea
                   id="description"
                   placeholder="Provide detailed information about your request"
@@ -128,14 +129,15 @@ const NewRequest = () => {
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   required
+                  className="text-sm"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="type">Type *</Label>
+                  <Label htmlFor="type" className="text-sm">Type *</Label>
                   <Select value={form.type} onValueChange={(value) => setForm({ ...form, type: value })}>
-                    <SelectTrigger id="type">
+                    <SelectTrigger id="type" className="text-sm">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -149,9 +151,9 @@ const NewRequest = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="priority">Priority *</Label>
+                  <Label htmlFor="priority" className="text-sm">Priority *</Label>
                   <Select value={form.priority} onValueChange={(value) => setForm({ ...form, priority: value })}>
-                    <SelectTrigger id="priority">
+                    <SelectTrigger id="priority" className="text-sm">
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
                     <SelectContent>
@@ -163,8 +165,8 @@ const NewRequest = () => {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button type="submit" disabled={loading} className="flex-1">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Button type="submit" disabled={loading} className="flex-1 text-sm">
                   {loading ? 'Creating...' : 'Create Request'}
                 </Button>
                 <Button 
@@ -172,6 +174,7 @@ const NewRequest = () => {
                   variant="outline" 
                   onClick={() => navigate('/')}
                   disabled={loading}
+                  className="sm:w-auto text-sm"
                 >
                   Cancel
                 </Button>

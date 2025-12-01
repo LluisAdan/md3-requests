@@ -161,15 +161,15 @@ const Requests = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Requests</h1>
-            <p className="text-muted-foreground mt-1">View and manage internal requests</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Requests</h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">View and manage internal requests</p>
           </div>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -187,10 +187,10 @@ const Requests = () => {
             <TabsTrigger value="all" className="flex-1 sm:flex-none">All Requests</TabsTrigger>
             <TabsTrigger value="my" className="flex-1 sm:flex-none">My Requests</TabsTrigger>
           </TabsList>
-          <TabsContent value="all" className="mt-6">
+          <TabsContent value="all" className="mt-4 md:mt-6">
             {renderRequestsTable()}
           </TabsContent>
-          <TabsContent value="my" className="mt-6">
+          <TabsContent value="my" className="mt-4 md:mt-6">
             {renderRequestsTable()}
           </TabsContent>
         </Tabs>
