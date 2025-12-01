@@ -1,23 +1,30 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { supabase, Request, RequestLog } from '@/lib/supabase';
-import { Layout } from '@/components/Layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { format } from 'date-fns';
-import { toast } from 'sonner';
-import { ArrowLeft, Calendar, User, ArrowUpCircle, Circle, Clock } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase, Request, RequestLog } from "@/lib/supabase";
+import { Layout } from "@/components/Layout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import { ArrowLeft, Calendar, User, Clock } from "lucide-react";
+
+type Profile = {
+  id: string;
+  email: string;
+  name: string | null;
+};
 
 const RequestDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [request, setRequest] = useState<Request | null>(null);
   const [logs, setLogs] = useState<RequestLog[]>([]);
+  const [creator, setCreator] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
@@ -25,36 +32,55 @@ const RequestDetail = () => {
       fetchRequest();
       fetchLogs();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchRequest = async () => {
-    const { data, error } = await supabase
-      .from('requests')
-      .select('*')
-      .eq('id', id)
-      .single();
+    setLoading(true);
 
-    if (error) {
-      toast.error('Failed to fetch request');
-      console.error('Error fetching request:', error);
-      navigate('/');
-    } else {
-      setRequest(data);
-      setSelectedStatus(data?.status || '');
+    const { data, error } = await supabase.from("requests").select("*").eq("id", id).single();
+
+    if (error || !data) {
+      toast.error("Failed to fetch request");
+      console.error("Error fetching request:", error);
+      navigate("/");
+      setLoading(false);
+      return;
     }
-    
+
+    setRequest(data);
+    setSelectedStatus(data.status || "");
+
+    // 🔹 cargar perfil del creador
+    if (data.created_by) {
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id, email, name")
+        .eq("id", data.created_by)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching creator profile:", profileError);
+        setCreator(null);
+      } else {
+        setCreator(profile);
+      }
+    } else {
+      setCreator(null);
+    }
+
     setLoading(false);
   };
 
   const fetchLogs = async () => {
     const { data, error } = await supabase
-      .from('request_logs')
-      .select('*')
-      .eq('request_id', id)
-      .order('created_at', { ascending: false });
+      .from("request_logs")
+      .select("*")
+      .eq("request_id", id)
+      .order("created_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching logs:', error);
+      console.error("Error fetching logs:", error);
     } else {
       setLogs(data || []);
     }
@@ -62,44 +88,54 @@ const RequestDetail = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
-      case 'high': return 'destructive';
-      case 'medium': return 'warning';
-      case 'low': return 'secondary';
-      default: return 'secondary';
+      case "high":
+        return "destructive";
+      case "medium":
+        return "warning";
+      case "low":
+        return "secondary";
+      default:
+        return "secondary";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'open': return 'default';
-      case 'in-progress': return 'warning';
-      case 'completed': return 'success';
-      case 'closed': return 'secondary';
-      default: return 'default';
+      case "open":
+        return "default";
+      case "in-progress":
+        return "warning";
+      case "completed":
+      case "done":
+        return "success";
+      case "closed":
+        return "secondary";
+      default:
+        return "default";
     }
   };
 
   const handleUpdateStatus = async () => {
     if (!request || !selectedStatus) return;
-    
+
     setUpdating(true);
     const { error } = await supabase
-      .from('requests')
-      .update({ 
+      .from("requests")
+      .update({
         status: selectedStatus,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
-      .eq('id', request.id);
+      .eq("id", request.id);
 
     if (error) {
-      toast.error('Failed to update status');
-      console.error('Error updating status:', error);
+      toast.error("Failed to update status");
+      console.error("Error updating status:", error);
     } else {
-      toast.success('Status updated successfully');
+      toast.success("Status updated successfully");
       await fetchRequest();
       await fetchLogs();
     }
-    
+
     setUpdating(false);
   };
 
@@ -118,7 +154,7 @@ const RequestDetail = () => {
       <Layout>
         <div className="text-center py-12">
           <p className="text-muted-foreground">Request not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4">
+          <Button onClick={() => navigate("/")} className="mt-4">
             Back to Requests
           </Button>
         </div>
@@ -129,11 +165,7 @@ const RequestDetail = () => {
   return (
     <Layout>
       <div className="max-w-5xl mx-auto space-y-6">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')}
-          className="gap-2"
-        >
+        <Button variant="ghost" onClick={() => navigate("/")} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
           Back to Requests
         </Button>
@@ -142,14 +174,12 @@ const RequestDetail = () => {
           <CardHeader>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <h1 className="text-4xl font-bold font-mono">
-                  #{request.public_id || request.id.slice(0, 8)}
-                </h1>
+                <h1 className="text-4xl font-bold font-mono">#{request.public_id || request.id.slice(0, 8)}</h1>
                 <Badge variant={getStatusColor(request.status)} className="text-sm px-3 py-1">
                   {request.status}
                 </Badge>
               </div>
-              
+
               <div className="flex flex-wrap gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">Type:</span>
@@ -157,24 +187,22 @@ const RequestDetail = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">Priority:</span>
-                  <Badge variant={getPriorityColor(request.priority)}>
-                    {request.priority}
-                  </Badge>
+                  <Badge variant={getPriorityColor(request.priority)}>{request.priority}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Created:</span>
-                  <span className="font-medium">{format(new Date(request.created_at), 'PPP')}</span>
+                  <span className="font-medium">{format(new Date(request.created_at), "PPP")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">By:</span>
-                  <span className="font-medium">{request.created_by}</span>
+                  <span className="font-medium">{creator?.name || creator?.email || "Unknown user"}</span>
                 </div>
               </div>
             </div>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             <div>
               <h3 className="font-semibold text-lg mb-3">Description</h3>
@@ -198,11 +226,8 @@ const RequestDetail = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button 
-                  onClick={handleUpdateStatus} 
-                  disabled={updating || selectedStatus === request.status}
-                >
-                  {updating ? 'Updating...' : 'Update Status'}
+                <Button onClick={handleUpdateStatus} disabled={updating || selectedStatus === request.status}>
+                  {updating ? "Updating..." : "Update Status"}
                 </Button>
               </div>
             </div>
@@ -216,9 +241,9 @@ const RequestDetail = () => {
               Activity / Logs
             </CardTitle>
             <CardDescription>
-              {logs.length === 0 
-                ? 'No activity recorded yet' 
-                : `${logs.length} event${logs.length !== 1 ? 's' : ''} recorded`}
+              {logs.length === 0
+                ? "No activity recorded yet"
+                : `${logs.length} event${logs.length !== 1 ? "s" : ""} recorded`}
             </CardDescription>
           </CardHeader>
           {logs.length > 0 && (
@@ -228,9 +253,7 @@ const RequestDetail = () => {
                   <div key={log.id} className="flex gap-4">
                     <div className="relative flex flex-col items-center">
                       <div className="h-3 w-3 rounded-full bg-primary shadow-glow" />
-                      {index !== logs.length - 1 && (
-                        <div className="flex-1 w-px bg-border mt-2" />
-                      )}
+                      {index !== logs.length - 1 && <div className="flex-1 w-px bg-border mt-2" />}
                     </div>
                     <div className="flex-1 pb-4">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
@@ -238,7 +261,7 @@ const RequestDetail = () => {
                           <div className="flex items-center gap-2">
                             <p className="font-semibold text-base">{log.event}</p>
                             <span className="text-xs text-muted-foreground sm:hidden">
-                              {format(new Date(log.created_at), 'MMM d, h:mm a')}
+                              {format(new Date(log.created_at), "MMM d, h:mm a")}
                             </span>
                           </div>
                           {log.details && (
@@ -259,7 +282,7 @@ const RequestDetail = () => {
                           )}
                         </div>
                         <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:block">
-                          {format(new Date(log.created_at), 'MMM d, h:mm a')}
+                          {format(new Date(log.created_at), "MMM d, h:mm a")}
                         </span>
                       </div>
                     </div>
