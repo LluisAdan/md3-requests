@@ -59,7 +59,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 className="gap-1.5 flex-shrink-0 text-xs sm:text-sm"
               >
                 <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden xs:inline">Sign Out</span>
+                <span className="hidden sm:inline">Sign Out</span>
               </Button>
             </div>
             

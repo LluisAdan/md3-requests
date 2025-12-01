@@ -66,7 +66,7 @@ const Requests = () => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "open":
-        return "default";
+        return "success";
       case "in-progress":
         return "warning";
       case "completed":
@@ -75,6 +75,22 @@ const Requests = () => {
         return "secondary";
       default:
         return "default";
+    }
+  };
+
+  const formatStatusLabel = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "in-progress":
+        return "In Progress";
+      case "open":
+        return "Open";
+      case "done":
+      case "completed":
+        return "Completed";
+      case "closed":
+        return "Closed";
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
     }
   };
 
@@ -103,7 +119,7 @@ const Requests = () => {
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="w-[100px]">ID</TableHead>
-                  <TableHead className="min-w-[250px]">Title</TableHead>
+                  <TableHead>Title</TableHead>
                   <TableHead className="hidden sm:table-cell">Type</TableHead>
                   <TableHead className="hidden md:table-cell">Priority</TableHead>
                   <TableHead className="hidden lg:table-cell">Status</TableHead>
@@ -130,7 +146,7 @@ const Requests = () => {
                           {request.priority}
                         </Badge>
                         <Badge variant={getStatusColor(request.status)} className="text-xs">
-                          {request.status}
+                          {formatStatusLabel(request.status)}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
                           {format(new Date(request.created_at), "MMM d, yyyy")}
@@ -144,7 +160,7 @@ const Requests = () => {
                       <Badge variant={getPriorityColor(request.priority)}>{request.priority}</Badge>
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
-                      <Badge variant={getStatusColor(request.status)}>{request.status}</Badge>
+                      <Badge variant={getStatusColor(request.status)}>{formatStatusLabel(request.status)}</Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground hidden xl:table-cell">
                       {format(new Date(request.created_at), "MMM d, yyyy")}

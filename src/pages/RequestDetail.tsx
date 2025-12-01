@@ -102,7 +102,7 @@ const RequestDetail = () => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "open":
-        return "default";
+        return "success";
       case "in-progress":
         return "warning";
       case "completed":
@@ -112,6 +112,22 @@ const RequestDetail = () => {
         return "secondary";
       default:
         return "default";
+    }
+  };
+
+  const formatStatusLabel = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "in-progress":
+        return "In Progress";
+      case "open":
+        return "Open";
+      case "done":
+      case "completed":
+        return "Completed";
+      case "closed":
+        return "Closed";
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
     }
   };
 
@@ -176,7 +192,7 @@ const RequestDetail = () => {
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono">#{request.public_id || request.id.slice(0, 8)}</h1>
                 <Badge variant={getStatusColor(request.status)} className="text-xs sm:text-sm px-2 sm:px-3 py-1 w-fit">
-                  {request.status}
+                  {formatStatusLabel(request.status)}
                 </Badge>
               </div>
 
