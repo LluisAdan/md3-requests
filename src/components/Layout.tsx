@@ -64,32 +64,34 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
             
             {/* Mobile navigation */}
-            <div className="flex items-center gap-2 px-3 py-2 border-t border-border/50 bg-background/50 overflow-x-auto">
-              <NavLink
-                to="/dashboard"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
-                activeClassName="bg-accent text-accent-foreground font-medium"
-              >
-                <LayoutDashboard className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span>Dashboard</span>
-              </NavLink>
-              <NavLink
-                to="/"
-                end
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
-                activeClassName="bg-accent text-accent-foreground font-medium"
-              >
-                <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span>Requests</span>
-              </NavLink>
-              <NavLink
-                to="/new"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
-                activeClassName="bg-accent text-accent-foreground font-medium"
-              >
-                <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span>New</span>
-              </NavLink>
+            <div className="flex items-center gap-2 px-3 py-2 border-t border-border/50 bg-background/50 overflow-x-auto scrollbar-hide">
+              <div className="flex items-center gap-2 min-w-max">
+                <NavLink
+                  to="/dashboard"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
+                  activeClassName="bg-accent text-accent-foreground font-medium"
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span>Dashboard</span>
+                </NavLink>
+                <NavLink
+                  to="/"
+                  end
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
+                  activeClassName="bg-accent text-accent-foreground font-medium"
+                >
+                  <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span>Requests</span>
+                </NavLink>
+                <NavLink
+                  to="/new"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
+                  activeClassName="bg-accent text-accent-foreground font-medium"
+                >
+                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <span>New</span>
+                </NavLink>
+              </div>
             </div>
           </header>
 

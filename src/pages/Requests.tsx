@@ -70,7 +70,8 @@ const Requests = () => {
       case "in-progress":
         return "warning";
       case "completed":
-        return "success";
+      case "done":
+        return "default";
       case "closed":
         return "secondary";
       default:
@@ -192,8 +193,7 @@ const Requests = () => {
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="open">Open</SelectItem>
               <SelectItem value="in-progress">In Progress</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
+              <SelectItem value="done">Completed</SelectItem>
             </SelectContent>
           </Select>
         </div>
