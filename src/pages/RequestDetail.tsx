@@ -107,7 +107,7 @@ const RequestDetail = () => {
         return "warning";
       case "completed":
       case "done":
-        return "success";
+        return "default";
       case "closed":
         return "secondary";
       default:
@@ -133,6 +133,13 @@ const RequestDetail = () => {
 
   const handleUpdateStatus = async () => {
     if (!request || !selectedStatus) return;
+
+    // Check if current user is the creator
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && user.id !== request.created_by) {
+      toast.error("Only the creator can modify the status");
+      return;
+    }
 
     setUpdating(true);
     const { error } = await supabase
