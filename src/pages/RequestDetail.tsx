@@ -245,7 +245,7 @@ const RequestDetail = () => {
                     <SelectContent>
                       <SelectItem value="open">Open</SelectItem>
                       <SelectItem value="in-progress">In Progress</SelectItem>
-                      <SelectItem value="done">Done</SelectItem>
+                      <SelectItem value="done">Completed</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -286,7 +286,16 @@ const RequestDetail = () => {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2">
                         <div className="space-y-1 sm:space-y-2">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                            <p className="font-semibold text-sm sm:text-base">{log.event}</p>
+                            <p className="font-semibold text-sm sm:text-base">
+                              {log.event}
+                              {log.event === "STATUS_CHANGED" && log.details?.new_status && (
+                                <span className="ml-2 font-normal text-muted-foreground">
+                                  → <Badge variant={getStatusColor(log.details.new_status)} className="text-xs">
+                                    {formatStatusLabel(log.details.new_status)}
+                                  </Badge>
+                                </span>
+                              )}
+                            </p>
                             <span className="text-xs text-muted-foreground sm:hidden">
                               {format(new Date(log.created_at), "MMM d, h:mm a")}
                             </span>
