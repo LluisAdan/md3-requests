@@ -31,10 +31,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
 
               <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">
-                  USER: <span className="font-medium text-foreground">{user?.email?.split('@')[0] || 'Unknown'}</span>
-                </span>
-                <Button 
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold uppercase">
+                    {(user?.email?.[0] || 'U').toUpperCase()}
+                  </div>
+                  <span className="text-sm text-muted-foreground">{user?.email?.split('@')[0] || 'Unknown'}</span>
+                </div>
+                <Button
                   variant="ghost" 
                   size="sm" 
                   onClick={signOut}
@@ -58,10 +61,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground hidden sm:block">
-                  USER: <span className="font-medium text-foreground">{user?.email?.split('@')[0] || 'Unknown'}</span>
-                </span>
-                <Button 
+                <div className="hidden sm:flex items-center gap-2">
+                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold uppercase">
+                    {(user?.email?.[0] || 'U').toUpperCase()}
+                  </div>
+                  <span className="text-xs text-muted-foreground">{user?.email?.split('@')[0] || 'Unknown'}</span>
+                </div>
+                <Button
                   variant="ghost" 
                   size="sm" 
                   onClick={signOut}

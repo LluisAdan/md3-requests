@@ -1,6 +1,5 @@
 import { Layout } from '@/components/Layout';
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, FileText, Clock, CheckCircle } from 'lucide-react';
 
 const Dashboard = () => {
   return (
@@ -11,15 +10,37 @@ const Dashboard = () => {
           <p className="text-sm text-muted-foreground mt-1">Overview of your requests and activity</p>
         </div>
 
-        <Card className="shadow-md border-border/50">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <LayoutDashboard className="h-16 w-16 text-muted-foreground mb-4" />
-            <CardTitle className="mb-2 text-xl">Coming Soon</CardTitle>
-            <CardDescription className="text-center max-w-md text-sm">
-              Dashboard analytics and insights will be available here
-            </CardDescription>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="p-6 rounded-xl bg-[#0F172A] shadow-md space-y-2">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Total Requests</span>
+            </div>
+            <p className="text-3xl font-bold">—</p>
+          </div>
+          <div className="p-6 rounded-xl bg-[#0F172A] shadow-md space-y-2">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">In Progress</span>
+            </div>
+            <p className="text-3xl font-bold">—</p>
+          </div>
+          <div className="p-6 rounded-xl bg-[#0F172A] shadow-md space-y-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Completed</span>
+            </div>
+            <p className="text-3xl font-bold">—</p>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-xl bg-[#0F172A] shadow-md flex flex-col items-center justify-center py-16">
+          <LayoutDashboard className="h-16 w-16 text-muted-foreground mb-4" />
+          <h2 className="mb-2 text-xl font-semibold">Coming Soon</h2>
+          <p className="text-center max-w-md text-sm text-muted-foreground">
+            Dashboard analytics and insights will be available here
+          </p>
+        </div>
       </div>
     </Layout>
   );
