@@ -17,15 +17,20 @@ type Profile = {
   name: string | null;
 };
 
+type LogWithUser = RequestLog & {
+  changedByName?: string;
+};
+
 const RequestDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [request, setRequest] = useState<Request | null>(null);
-  const [logs, setLogs] = useState<RequestLog[]>([]);
+  const [logs, setLogs] = useState<LogWithUser[]>([]);
   const [creator, setCreator] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [updating, setUpdating] = useState(false);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -82,7 +87,24 @@ const RequestDetail = () => {
     if (error) {
       console.error("Error fetching logs:", error);
     } else {
-      setLogs(data || []);
+      // Fetch user names for logs that have changed_by
+      const logsWithUsers: LogWithUser[] = await Promise.all(
+        (data || []).map(async (log) => {
+          if (log.details?.changed_by) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("name, email")
+              .eq("id", log.details.changed_by)
+              .single();
+            return {
+              ...log,
+              changedByName: profile?.name || profile?.email?.split('@')[0] || 'Unknown'
+            };
+          }
+          return log;
+        })
+      );
+      setLogs(logsWithUsers);
     }
   };
 
@@ -151,15 +173,18 @@ const RequestDetail = () => {
       .eq("id", request.id);
 
     if (error) {
-      toast.error("Failed to update status");
+      setNotification({ message: "Failed to update status", type: 'error' });
       console.error("Error updating status:", error);
     } else {
-      toast.success("Status updated successfully");
+      setNotification({ message: "Status updated successfully", type: 'success' });
       await fetchRequest();
       await fetchLogs();
     }
 
     setUpdating(false);
+    
+    // Auto-hide notification after 5 seconds
+    setTimeout(() => setNotification(null), 5000);
   };
 
   if (loading) {
@@ -298,6 +323,7 @@ const RequestDetail = () => {
                             </p>
                             <span className="text-xs text-muted-foreground sm:hidden">
                               {format(new Date(log.created_at), "MMM d, h:mm a")}
+                              {log.changedByName && ` · by ${log.changedByName}`}
                             </span>
                           </div>
                           {log.details && (
@@ -317,9 +343,12 @@ const RequestDetail = () => {
                             </div>
                           )}
                         </div>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:block">
-                          {format(new Date(log.created_at), "MMM d, h:mm a")}
-                        </span>
+                        <div className="text-xs text-muted-foreground whitespace-nowrap hidden sm:flex sm:flex-col sm:items-end gap-0.5">
+                          <span>{format(new Date(log.created_at), "MMM d, h:mm a")}</span>
+                          {log.changedByName && (
+                            <span className="text-muted-foreground/70">by {log.changedByName}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -328,6 +357,17 @@ const RequestDetail = () => {
             </CardContent>
           )}
         </Card>
+
+        {/* Inline notification */}
+        {notification && (
+          <div className={`p-4 rounded-lg border text-center ${
+            notification.type === 'success' 
+              ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300' 
+              : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
+          }`}>
+            <p className="text-lg font-medium">{notification.message}</p>
+          </div>
+        )}
       </div>
     </Layout>
   );

@@ -6,7 +6,7 @@ import { AppSidebar } from './AppSidebar';
 import { NavLink } from './NavLink';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
 
   return (
     <SidebarProvider>
@@ -30,15 +30,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 </div>
               </div>
 
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={signOut}
-                className="gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Button>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground">
+                  USER: <span className="font-medium text-foreground">{user?.email?.split('@')[0] || 'Unknown'}</span>
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={signOut}
+                  className="gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
           </header>
 
@@ -52,15 +57,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 <span className="text-sm sm:text-base font-semibold text-foreground truncate">Requests Portal</span>
               </div>
 
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={signOut}
-                className="gap-1.5 flex-shrink-0 text-xs sm:text-sm"
-              >
-                <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Sign Out</span>
-              </Button>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground hidden sm:block">
+                  USER: <span className="font-medium text-foreground">{user?.email?.split('@')[0] || 'Unknown'}</span>
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={signOut}
+                  className="gap-1.5 flex-shrink-0 text-xs sm:text-sm"
+                >
+                  <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </Button>
+              </div>
             </div>
             
             {/* Mobile navigation */}
