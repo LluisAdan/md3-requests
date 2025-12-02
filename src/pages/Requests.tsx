@@ -87,7 +87,7 @@ const Requests = () => {
                 {requests.map((request) => (
                   <TableRow 
                     key={request.id} 
-                    className="cursor-pointer group hover:bg-row-hover transition-colors border-border/30"
+                    className="cursor-pointer group hover:bg-[#1A1F2A] transition-colors border-border/30"
                   >
                     <TableCell className="font-mono text-sm">
                       <Link to={`/request/${request.id}`} className="text-primary hover:underline font-semibold">
