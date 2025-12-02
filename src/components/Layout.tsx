@@ -16,14 +16,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <AppSidebar />
         </div>
         
-        <div className="flex-1 flex flex-col w-full">
+        <div className="flex-1 flex flex-col w-full min-w-0">
           {/* Desktop header */}
-          <header className="hidden md:flex border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-            <div className="flex items-center justify-between px-4 py-4 w-full">
+          <header className="hidden md:flex border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+            <div className="flex items-center justify-between px-6 py-4 w-full">
               <div className="flex items-center gap-4">
-                <SidebarTrigger />
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <SidebarTrigger className="h-10 w-10" />
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
                     <Inbox className="h-5 w-5 text-white" />
                   </div>
                   <span className="text-xl font-semibold text-foreground">Internal Requests Portal</span>
@@ -38,7 +38,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   variant="ghost" 
                   size="sm" 
                   onClick={signOut}
-                  className="gap-2"
+                  className="gap-2 h-10 hover:bg-destructive/10 hover:text-destructive transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign Out
@@ -48,10 +48,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </header>
 
           {/* Mobile top bar */}
-          <header className="md:hidden border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-            <div className="flex items-center justify-between px-3 py-2.5">
+          <header className="md:hidden border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+            <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 shadow-sm">
                   <Inbox className="h-4 w-4 text-white" />
                 </div>
                 <span className="text-sm sm:text-base font-semibold text-foreground truncate">Requests Portal</span>
@@ -65,40 +65,40 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   variant="ghost" 
                   size="sm" 
                   onClick={signOut}
-                  className="gap-1.5 flex-shrink-0 text-xs sm:text-sm"
+                  className="gap-1.5 flex-shrink-0 h-9 hover:bg-destructive/10 hover:text-destructive transition-colors"
                 >
-                  <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Sign Out</span>
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline text-sm">Sign Out</span>
                 </Button>
               </div>
             </div>
             
             {/* Mobile navigation */}
-            <div className="flex items-center gap-2 px-3 py-2 border-t border-border/50 bg-background/50 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-2 px-4 py-2 border-t border-border/30 bg-section overflow-x-auto scrollbar-hide">
               <div className="flex items-center gap-2 min-w-max">
                 <NavLink
                   to="/dashboard"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
-                  activeClassName="bg-accent text-accent-foreground font-medium"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-row-hover transition-colors whitespace-nowrap"
+                  activeClassName="bg-primary/10 text-primary font-medium"
                 >
-                  <LayoutDashboard className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
                   <span>Dashboard</span>
                 </NavLink>
                 <NavLink
                   to="/"
                   end
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
-                  activeClassName="bg-accent text-accent-foreground font-medium"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-row-hover transition-colors whitespace-nowrap"
+                  activeClassName="bg-primary/10 text-primary font-medium"
                 >
-                  <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <FileText className="h-4 w-4 flex-shrink-0" />
                   <span>Requests</span>
                 </NavLink>
                 <NavLink
                   to="/new"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs sm:text-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
-                  activeClassName="bg-accent text-accent-foreground font-medium"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-row-hover transition-colors whitespace-nowrap"
+                  activeClassName="bg-primary/10 text-primary font-medium"
                 >
-                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                  <Plus className="h-4 w-4 flex-shrink-0" />
                   <span>New</span>
                 </NavLink>
               </div>

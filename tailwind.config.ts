@@ -55,6 +55,8 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        section: "hsl(var(--section-bg))",
+        "row-hover": "hsl(var(--row-hover))",
       },
       fontFamily: {
         sans: ['Outfit', 'sans-serif'],
