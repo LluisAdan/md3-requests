@@ -59,7 +59,6 @@ const NewRequest = () => {
     } else {
       toast.success('Request created successfully');
       
-      // Trigger webhook
       try {
         await fetch('https://hook.eu2.make.com/5hdkgbq34m0q2w8nab4348s4mr5gkndo', {
           method: 'POST',
@@ -79,7 +78,6 @@ const NewRequest = () => {
         });
       } catch (webhookError) {
         console.error('Webhook error:', webhookError);
-        // Don't show error to user, just log it
       }
       
       navigate(`/request/${data.id}`);
@@ -90,38 +88,38 @@ const NewRequest = () => {
 
   return (
     <Layout>
-      <div className="w-full max-w-2xl mx-auto">
-        <div className="mb-4 md:mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Create New Request</h1>
-          <p className="text-sm md:text-base text-muted-foreground mt-1">Submit a new internal request</p>
+      <div className="w-full max-w-2xl mx-auto px-4 md:px-0">
+        <div className="mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">Create New Request</h1>
+          <p className="text-sm text-muted-foreground mt-1">Submit a new internal request</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
-              <Plus className="h-4 w-4 md:h-5 md:w-5" />
+        <Card className="shadow-md border-border/50">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Plus className="h-5 w-5" />
               Request Details
             </CardTitle>
-            <CardDescription className="text-xs md:text-sm">
+            <CardDescription className="text-sm">
               Fill in the information below to create your request
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+          <CardContent className="p-6 pt-0">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-sm">Title *</Label>
+                <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
                 <Input
                   id="title"
                   placeholder="Brief description of your request"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   required
-                  className="text-sm"
+                  className="h-10 focus:ring-2 focus:ring-primary/40"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm">Description *</Label>
+                <Label htmlFor="description" className="text-sm font-medium">Description *</Label>
                 <Textarea
                   id="description"
                   placeholder="Provide detailed information about your request"
@@ -129,15 +127,15 @@ const NewRequest = () => {
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   required
-                  className="text-sm"
+                  className="focus:ring-2 focus:ring-primary/40 resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="type" className="text-sm">Type *</Label>
+                  <Label htmlFor="type" className="text-sm font-medium">Type *</Label>
                   <Select value={form.type} onValueChange={(value) => setForm({ ...form, type: value })}>
-                    <SelectTrigger id="type" className="text-sm">
+                    <SelectTrigger id="type" className="h-10 focus:ring-2 focus:ring-primary/40">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -151,9 +149,9 @@ const NewRequest = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="priority" className="text-sm">Priority *</Label>
+                  <Label htmlFor="priority" className="text-sm font-medium">Priority *</Label>
                   <Select value={form.priority} onValueChange={(value) => setForm({ ...form, priority: value })}>
-                    <SelectTrigger id="priority" className="text-sm">
+                    <SelectTrigger id="priority" className="h-10 focus:ring-2 focus:ring-primary/40">
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
                     <SelectContent>
@@ -166,7 +164,11 @@ const NewRequest = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button type="submit" disabled={loading} className="flex-1 text-sm">
+                <Button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="flex-1 h-10 disabled:opacity-50 disabled:pointer-events-none focus:ring-2 focus:ring-primary/40"
+                >
                   {loading ? 'Creating...' : 'Create Request'}
                 </Button>
                 <Button 
@@ -174,7 +176,7 @@ const NewRequest = () => {
                   variant="outline" 
                   onClick={() => navigate('/')}
                   disabled={loading}
-                  className="sm:w-auto text-sm"
+                  className="sm:w-auto h-10 focus:ring-2 focus:ring-primary/40"
                 >
                   Cancel
                 </Button>

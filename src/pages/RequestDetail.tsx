@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar, User, Clock } from "lucide-react";
+import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import { getPriorityClasses, getStatusClasses, formatStatusLabel } from "@/lib/badge-styles";
 
 type Profile = {
   id: string;
@@ -56,7 +57,6 @@ const RequestDetail = () => {
     setRequest(data);
     setSelectedStatus(data.status || "");
 
-    // 🔹 cargar perfil del creador
     if (data.created_by) {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
@@ -87,7 +87,6 @@ const RequestDetail = () => {
     if (error) {
       console.error("Error fetching logs:", error);
     } else {
-      // Fetch user names for logs that have changed_by
       const logsWithUsers: LogWithUser[] = await Promise.all(
         (data || []).map(async (log) => {
           if (log.details?.changed_by) {
@@ -108,55 +107,9 @@ const RequestDetail = () => {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case "high":
-        return "destructive";
-      case "medium":
-        return "warning";
-      case "low":
-        return "secondary";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "open":
-        return "success";
-      case "in-progress":
-        return "warning";
-      case "completed":
-      case "done":
-        return "default";
-      case "closed":
-        return "secondary";
-      default:
-        return "default";
-    }
-  };
-
-  const formatStatusLabel = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "in-progress":
-        return "In Progress";
-      case "open":
-        return "Open";
-      case "done":
-      case "completed":
-        return "Completed";
-      case "closed":
-        return "Closed";
-      default:
-        return status.charAt(0).toUpperCase() + status.slice(1);
-    }
-  };
-
   const handleUpdateStatus = async () => {
     if (!request || !selectedStatus) return;
 
-    // Check if current user is the creator
     const { data: { user } } = await supabase.auth.getUser();
     if (user && user.id !== request.created_by) {
       toast.error("Only the creator can modify the status");
@@ -182,9 +135,13 @@ const RequestDetail = () => {
     }
 
     setUpdating(false);
-    
-    // Auto-hide notification after 5 seconds
     setTimeout(() => setNotification(null), 5000);
+  };
+
+  const getCreatorInitial = () => {
+    if (creator?.name) return creator.name.charAt(0).toUpperCase();
+    if (creator?.email) return creator.email.charAt(0).toUpperCase();
+    return "?";
   };
 
   if (loading) {
@@ -202,7 +159,7 @@ const RequestDetail = () => {
       <Layout>
         <div className="text-center py-12">
           <p className="text-muted-foreground">Request not found</p>
-          <Button onClick={() => navigate("/")} className="mt-4">
+          <Button onClick={() => navigate("/")} className="mt-4 h-10">
             Back to Requests
           </Button>
         </div>
@@ -212,59 +169,69 @@ const RequestDetail = () => {
 
   return (
     <Layout>
-      <div className="w-full max-w-5xl mx-auto space-y-4 md:space-y-6">
-        <Button variant="ghost" onClick={() => navigate("/")} className="gap-2 text-sm md:text-base">
+      <div className="w-full max-w-5xl mx-auto space-y-6 px-4 md:px-0">
+        <Button variant="ghost" onClick={() => navigate("/")} className="gap-2 h-10 -ml-2">
           <ArrowLeft className="h-4 w-4" />
           Back to Requests
         </Button>
 
-        <Card className="shadow-medium">
-          <CardHeader>
+        <Card className="shadow-md border-border/50">
+          <CardHeader className="pb-4">
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-mono">#{request.public_id || request.id.slice(0, 8)}</h1>
-                <Badge variant={getStatusColor(request.status)} className="text-xs sm:text-sm px-2 sm:px-3 py-1 w-fit">
+                <h1 className="text-3xl sm:text-4xl font-bold font-mono text-foreground">
+                  #{request.public_id || request.id.slice(0, 8)}
+                </h1>
+                <Badge className={`text-sm px-3 py-1 w-fit border ${getStatusClasses(request.status)}`}>
                   {formatStatusLabel(request.status)}
                 </Badge>
               </div>
 
-              <div className="flex flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">
+              <div className="flex flex-wrap gap-3 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">Type:</span>
                   <Badge variant="outline" className="text-xs">{request.type}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">Priority:</span>
-                  <Badge variant={getPriorityColor(request.priority)} className="text-xs">{request.priority}</Badge>
+                  <Badge className={`text-xs border ${getPriorityClasses(request.priority)}`}>
+                    {request.priority}
+                  </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground hidden sm:inline">Created:</span>
                   <span className="font-medium">{format(new Date(request.created_at), "PP")}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <User className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium text-primary">
+                    {getCreatorInitial()}
+                  </div>
                   <span className="text-muted-foreground hidden sm:inline">By:</span>
-                  <span className="font-medium truncate max-w-[150px] sm:max-w-none">{creator?.name || creator?.email || "Unknown user"}</span>
+                  <span className="font-medium truncate max-w-[150px] sm:max-w-none">
+                    {creator?.name || creator?.email || "Unknown user"}
+                  </span>
                 </div>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 sm:space-y-6">
+          <CardContent className="space-y-6">
             <div>
-              <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3">Description</h3>
-              <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-wrap leading-relaxed">{request.description}</p>
+              <h3 className="font-semibold text-lg mb-3 text-foreground">Description</h3>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                {request.description}
+              </p>
             </div>
 
-            <Separator />
+            <Separator className="bg-border/50" />
 
-            <div className="space-y-3 sm:space-y-4">
-              <h3 className="font-semibold text-base sm:text-lg">Update Status</h3>
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg text-foreground">Update Status</h3>
               <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
                 <div className="flex-1 sm:max-w-xs">
                   <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                    <SelectTrigger className="text-sm">
+                    <SelectTrigger className="h-10 focus:ring-2 focus:ring-primary/40">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -277,7 +244,7 @@ const RequestDetail = () => {
                 <Button 
                   onClick={handleUpdateStatus} 
                   disabled={updating || selectedStatus === request.status}
-                  className="w-full sm:w-auto text-sm"
+                  className="w-full sm:w-auto h-10 disabled:opacity-50 disabled:pointer-events-none focus:ring-2 focus:ring-primary/40"
                 >
                   {updating ? "Updating..." : "Update Status"}
                 </Button>
@@ -286,13 +253,13 @@ const RequestDetail = () => {
           </CardContent>
         </Card>
 
-        <Card className="shadow-medium">
+        <Card className="shadow-md border-border/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Clock className="h-5 w-5" />
               Activity / Logs
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+            <CardDescription className="text-sm">
               {logs.length === 0
                 ? "No activity recorded yet"
                 : `${logs.length} event${logs.length !== 1 ? "s" : ""} recorded`}
@@ -300,22 +267,22 @@ const RequestDetail = () => {
           </CardHeader>
           {logs.length > 0 && (
             <CardContent>
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-6">
                 {logs.map((log, index) => (
-                  <div key={log.id} className="flex gap-3 sm:gap-4">
+                  <div key={log.id} className="flex gap-4">
                     <div className="relative flex flex-col items-center">
-                      <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-primary shadow-glow" />
-                      {index !== logs.length - 1 && <div className="flex-1 w-px bg-border mt-2" />}
+                      <div className="h-3 w-3 rounded-full bg-primary shadow-glow" />
+                      {index !== logs.length - 1 && <div className="flex-1 w-px bg-border/50 mt-2" />}
                     </div>
                     <div className="flex-1 pb-4">
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2">
-                        <div className="space-y-1 sm:space-y-2">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                            <p className="font-semibold text-sm sm:text-base">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                        <div className="space-y-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <p className="font-semibold text-sm text-foreground">
                               {log.event}
                               {log.event === "STATUS_CHANGED" && log.details?.new_status && (
                                 <span className="ml-2 font-normal text-muted-foreground">
-                                  → <Badge variant={getStatusColor(log.details.new_status)} className="text-xs">
+                                  → <Badge className={`text-xs border ${getStatusClasses(log.details.new_status)}`}>
                                     {formatStatusLabel(log.details.new_status)}
                                   </Badge>
                                 </span>
@@ -327,7 +294,7 @@ const RequestDetail = () => {
                             </span>
                           </div>
                           {log.details && (
-                            <div className="text-xs sm:text-sm text-muted-foreground space-y-1">
+                            <div className="text-sm text-muted-foreground space-y-1">
                               {log.details.public_id && (
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium">ID:</span>
@@ -358,12 +325,11 @@ const RequestDetail = () => {
           )}
         </Card>
 
-        {/* Inline notification */}
         {notification && (
-          <div className={`p-4 rounded-lg border text-center ${
+          <div className={`p-4 rounded-lg border text-center transition-all ${
             notification.type === 'success' 
-              ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300' 
-              : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
+              ? 'bg-[#1A2B1A] border-[#4ADE80]/30 text-[#4ADE80]' 
+              : 'bg-[#2B1A1A] border-[#F87171]/30 text-[#F87171]'
           }`}>
             <p className="text-lg font-medium">{notification.message}</p>
           </div>

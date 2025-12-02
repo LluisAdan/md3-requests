@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { FileText } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { getPriorityClasses, getStatusClasses, formatStatusLabel } from "@/lib/badge-styles";
 
 const Requests = () => {
   const navigate = useNavigate();
@@ -50,51 +51,6 @@ const Requests = () => {
     setLoading(false);
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case "high":
-        return "destructive";
-      case "medium":
-        return "warning";
-      case "low":
-        return "success";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "open":
-        return "success";
-      case "in-progress":
-        return "warning";
-      case "completed":
-      case "done":
-        return "default";
-      case "closed":
-        return "secondary";
-      default:
-        return "default";
-    }
-  };
-
-  const formatStatusLabel = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "in-progress":
-        return "In Progress";
-      case "open":
-        return "Open";
-      case "done":
-      case "completed":
-        return "Completed";
-      case "closed":
-        return "Closed";
-      default:
-        return status.charAt(0).toUpperCase() + status.slice(1);
-    }
-  };
-
   const renderRequestsTable = () => (
     <>
       {loading ? (
@@ -102,34 +58,37 @@ const Requests = () => {
           <div className="animate-pulse text-muted-foreground">Loading requests...</div>
         </div>
       ) : requests.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
+        <Card className="shadow-md">
+          <CardContent className="flex flex-col items-center justify-center py-16">
             <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground text-center">
-              {statusFilter === "all" ? "No requests found" : `No ${statusFilter} requests found`}
+            <p className="text-muted-foreground text-center text-sm">
+              {statusFilter === "all" ? "No requests found" : `No ${formatStatusLabel(statusFilter).toLowerCase()} requests found`}
             </p>
             <Link to="/new">
-              <Button className="mt-4">Create your first request</Button>
+              <Button className="mt-4 h-10">Create your first request</Button>
             </Link>
           </CardContent>
         </Card>
       ) : (
-        <Card className="shadow-medium overflow-hidden">
+        <Card className="shadow-md overflow-hidden border-border/50">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[100px]">ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead className="hidden sm:table-cell">Type</TableHead>
-                  <TableHead className="hidden md:table-cell">Priority</TableHead>
-                  <TableHead className="hidden lg:table-cell">Status</TableHead>
-                  <TableHead className="hidden xl:table-cell">Created</TableHead>
+                <TableRow className="hover:bg-transparent border-border/50">
+                  <TableHead className="w-[100px] text-muted-foreground font-medium">ID</TableHead>
+                  <TableHead className="text-muted-foreground font-medium">Title</TableHead>
+                  <TableHead className="hidden sm:table-cell text-muted-foreground font-medium">Type</TableHead>
+                  <TableHead className="hidden md:table-cell text-muted-foreground font-medium">Priority</TableHead>
+                  <TableHead className="hidden lg:table-cell text-muted-foreground font-medium">Status</TableHead>
+                  <TableHead className="hidden xl:table-cell text-muted-foreground font-medium">Created</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {requests.map((request) => (
-                  <TableRow key={request.id} className="cursor-pointer group">
+                  <TableRow 
+                    key={request.id} 
+                    className="cursor-pointer group hover:bg-row-hover transition-colors border-border/30"
+                  >
                     <TableCell className="font-mono text-sm">
                       <Link to={`/request/${request.id}`} className="text-primary hover:underline font-semibold">
                         #{request.public_id || request.id.slice(0, 8)}
@@ -143,10 +102,10 @@ const Requests = () => {
                         <Badge variant="outline" className="text-xs">
                           {request.type}
                         </Badge>
-                        <Badge variant={getPriorityColor(request.priority)} className="text-xs">
+                        <Badge className={`text-xs border ${getPriorityClasses(request.priority)}`}>
                           {request.priority}
                         </Badge>
-                        <Badge variant={getStatusColor(request.status)} className="text-xs">
+                        <Badge className={`text-xs border ${getStatusClasses(request.status)}`}>
                           {formatStatusLabel(request.status)}
                         </Badge>
                         <span className="text-xs text-muted-foreground">
@@ -155,15 +114,19 @@ const Requests = () => {
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      <Badge variant="outline">{request.type}</Badge>
+                      <Badge variant="outline" className="text-xs">{request.type}</Badge>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      <Badge variant={getPriorityColor(request.priority)}>{request.priority}</Badge>
+                      <Badge className={`text-xs border ${getPriorityClasses(request.priority)}`}>
+                        {request.priority}
+                      </Badge>
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
-                      <Badge variant={getStatusColor(request.status)}>{formatStatusLabel(request.status)}</Badge>
+                      <Badge className={`text-xs border ${getStatusClasses(request.status)}`}>
+                        {formatStatusLabel(request.status)}
+                      </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground hidden xl:table-cell">
+                    <TableCell className="text-muted-foreground text-sm hidden xl:table-cell">
                       {format(new Date(request.created_at), "MMM d, yyyy")}
                     </TableCell>
                   </TableRow>
@@ -178,15 +141,15 @@ const Requests = () => {
 
   return (
     <Layout>
-      <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6">
+      <div className="w-full max-w-7xl mx-auto space-y-6 px-4 md:px-0">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Requests</h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">View and manage internal requests</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">Requests</h1>
+            <p className="text-sm text-muted-foreground mt-1">View and manage internal requests</p>
           </div>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px] h-10 focus:ring-2 focus:ring-primary/40">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -199,14 +162,14 @@ const Requests = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full sm:w-auto">
-            <TabsTrigger value="all" className="flex-1 sm:flex-none">All Requests</TabsTrigger>
-            <TabsTrigger value="my" className="flex-1 sm:flex-none">My Requests</TabsTrigger>
+          <TabsList className="w-full sm:w-auto h-10">
+            <TabsTrigger value="all" className="flex-1 sm:flex-none h-9">All Requests</TabsTrigger>
+            <TabsTrigger value="my" className="flex-1 sm:flex-none h-9">My Requests</TabsTrigger>
           </TabsList>
-          <TabsContent value="all" className="mt-4 md:mt-6">
+          <TabsContent value="all" className="mt-6">
             {renderRequestsTable()}
           </TabsContent>
-          <TabsContent value="my" className="mt-4 md:mt-6">
+          <TabsContent value="my" className="mt-6">
             {renderRequestsTable()}
           </TabsContent>
         </Tabs>

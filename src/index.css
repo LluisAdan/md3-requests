@@ -50,6 +50,12 @@ All colors MUST be HSL.
     --shadow-soft: 0 2px 12px -3px hsl(0 0% 0% / 0.3);
     --shadow-medium: 0 8px 24px -6px hsl(0 0% 0% / 0.4);
     --shadow-glow: 0 0 30px -8px hsl(217 91% 60% / 0.3);
+
+    /* Section backgrounds */
+    --section-bg: 222 47% 13%;
+
+    /* Row hover */
+    --row-hover: 220 40% 12%;
   }
 }
 
