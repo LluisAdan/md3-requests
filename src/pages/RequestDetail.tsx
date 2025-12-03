@@ -117,11 +117,6 @@ const RequestDetail = () => {
     if (!request || !selectedStatus) return;
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (user && user.id !== request.created_by) {
-      setNotification({ message: "Only the creator can modify the status", type: 'error' });
-      setTimeout(() => setNotification(null), 5000);
-      return;
-    }
 
     setUpdating(true);
     const { error } = await supabase
@@ -243,11 +238,6 @@ const RequestDetail = () => {
                     variant="outline"
                     onClick={async () => {
                       const { data: { user } } = await supabase.auth.getUser();
-                      if (user && user.id !== request.created_by) {
-                        setNotification({ message: "Only the creator can reopen this request", type: 'error' });
-                        setTimeout(() => setNotification(null), 5000);
-                        return;
-                      }
                       setUpdating(true);
                       const { error } = await supabase
                         .from("requests")
