@@ -111,7 +111,9 @@ const Requests = () => {
                   <TableHead className="hidden sm:table-cell text-muted-foreground font-medium">Type</TableHead>
                   <TableHead className="hidden md:table-cell text-muted-foreground font-medium">Priority</TableHead>
                   <TableHead className="hidden lg:table-cell text-muted-foreground font-medium">Status</TableHead>
-                  <TableHead className="hidden lg:table-cell text-muted-foreground font-medium">Assigned</TableHead>
+                  {activeTab !== "my" && (
+                    <TableHead className="hidden lg:table-cell text-muted-foreground font-medium">Assigned</TableHead>
+                  )}
                   <TableHead className="hidden xl:table-cell text-muted-foreground font-medium">Created</TableHead>
                 </TableRow>
               </TableHeader>
@@ -158,9 +160,11 @@ const Requests = () => {
                         {formatStatusLabel(request.status)}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                      {request.assignedName || 'Unknown'}
-                    </TableCell>
+                    {activeTab !== "my" && (
+                      <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
+                        {request.assignedName || 'Unknown'}
+                      </TableCell>
+                    )}
                     <TableCell className="text-muted-foreground text-sm hidden xl:table-cell">
                       {format(new Date(request.created_at), "MMM d, yyyy")}
                     </TableCell>
