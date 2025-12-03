@@ -21,7 +21,7 @@ export const getStatusClasses = (status: string): string => {
       return "bg-[#0F172A] text-[#60A5FA] border-[#60A5FA]/20";
     case "completed":
     case "done":
-      return "bg-[#162327] text-[#34D399] border-[#34D399]/20";
+      return "bg-[#1E1B4B] text-[#A78BFA] border-[#A78BFA]/20";
     case "closed":
       return "bg-[#2C2C2C] text-[#A1A1AA] border-[#A1A1AA]/20";
     default:

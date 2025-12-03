@@ -8,7 +8,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 const STATUS_COLORS: Record<string, string> = {
   open: '#4ADE80',
   'in-progress': '#60A5FA',
-  completed: '#34D399',
+  completed: '#A78BFA',
+  done: '#A78BFA',
   closed: '#A1A1AA',
 };
 
@@ -16,8 +17,11 @@ const STATUS_LABELS: Record<string, string> = {
   open: 'Open',
   'in-progress': 'In Progress',
   completed: 'Completed',
+  done: 'Completed',
   closed: 'Closed',
 };
+
+const ALL_STATUSES = ['open', 'in-progress', 'completed', 'closed'];
 
 type StatusCount = {
   status: string;
@@ -50,12 +54,16 @@ const Dashboard = () => {
       if (allRequests.data) {
         const counts: Record<string, number> = {};
         allRequests.data.forEach((req) => {
-          const status = req.status || 'unknown';
+          let status = req.status || 'unknown';
+          // Normalize "done" to "completed"
+          if (status === 'done') status = 'completed';
           counts[status] = (counts[status] || 0) + 1;
         });
-        const chartData = Object.entries(counts)
-          .filter(([status]) => ['open', 'in-progress', 'completed', 'closed'].includes(status))
-          .map(([status, count]) => ({ status, count }));
+        // Ensure all 4 statuses are present
+        const chartData = ALL_STATUSES.map((status) => ({
+          status,
+          count: counts[status] || 0,
+        }));
         setStatusData(chartData);
       }
 
