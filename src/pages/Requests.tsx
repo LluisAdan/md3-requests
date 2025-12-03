@@ -14,10 +14,14 @@ import { FileText } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPriorityClasses, getStatusClasses, formatStatusLabel } from "@/lib/badge-styles";
 
+type RequestWithAssigned = Request & {
+  assignedName?: string;
+};
+
 const Requests = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [requests, setRequests] = useState<Request[]>([]);
+  const [requests, setRequests] = useState<RequestWithAssigned[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<string>("all");
@@ -45,8 +49,27 @@ const Requests = () => {
       toast.error("Failed to fetch requests");
       console.error("Error fetching requests:", error);
     } else {
+      // Fetch assigned user names
+      const requestsWithAssigned: RequestWithAssigned[] = await Promise.all(
+        (data || []).map(async (req) => {
+          const assignedId = req.assigned_to || req.created_by;
+          if (assignedId) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("name, email")
+              .eq("id", assignedId)
+              .single();
+            return {
+              ...req,
+              assignedName: profile?.name || profile?.email?.split('@')[0] || 'Unknown'
+            };
+          }
+          return { ...req, assignedName: 'Unknown' };
+        })
+      );
+      
       // Sort: non-closed first (by created_at desc), then closed (by created_at desc)
-      const sorted = (data || []).sort((a, b) => {
+      const sorted = requestsWithAssigned.sort((a, b) => {
         const aIsClosed = a.status.toLowerCase() === "closed";
         const bIsClosed = b.status.toLowerCase() === "closed";
         if (aIsClosed && !bIsClosed) return 1;
@@ -88,6 +111,7 @@ const Requests = () => {
                   <TableHead className="hidden sm:table-cell text-muted-foreground font-medium">Type</TableHead>
                   <TableHead className="hidden md:table-cell text-muted-foreground font-medium">Priority</TableHead>
                   <TableHead className="hidden lg:table-cell text-muted-foreground font-medium">Status</TableHead>
+                  <TableHead className="hidden lg:table-cell text-muted-foreground font-medium">Assigned</TableHead>
                   <TableHead className="hidden xl:table-cell text-muted-foreground font-medium">Created</TableHead>
                 </TableRow>
               </TableHeader>
@@ -133,6 +157,9 @@ const Requests = () => {
                       <Badge className={`text-xs border ${getStatusClasses(request.status)}`}>
                         {formatStatusLabel(request.status)}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
+                      {request.assignedName || 'Unknown'}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm hidden xl:table-cell">
                       {format(new Date(request.created_at), "MMM d, yyyy")}
