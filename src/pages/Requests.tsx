@@ -45,7 +45,15 @@ const Requests = () => {
       toast.error("Failed to fetch requests");
       console.error("Error fetching requests:", error);
     } else {
-      setRequests(data || []);
+      // Sort: non-closed first (by created_at desc), then closed (by created_at desc)
+      const sorted = (data || []).sort((a, b) => {
+        const aIsClosed = a.status.toLowerCase() === "closed";
+        const bIsClosed = b.status.toLowerCase() === "closed";
+        if (aIsClosed && !bIsClosed) return 1;
+        if (!aIsClosed && bIsClosed) return -1;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+      setRequests(sorted);
     }
 
     setLoading(false);
@@ -156,7 +164,8 @@ const Requests = () => {
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="open">Open</SelectItem>
               <SelectItem value="in-progress">In Progress</SelectItem>
-              <SelectItem value="done">Completed</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="closed">Closed</SelectItem>
             </SelectContent>
           </Select>
         </div>

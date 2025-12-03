@@ -228,27 +228,32 @@ const RequestDetail = () => {
 
             <div className="space-y-4">
               <h3 className="font-semibold text-lg text-foreground">Update Status</h3>
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
-                <div className="flex-1 sm:max-w-xs">
-                  <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                    <SelectTrigger className="h-10 focus:ring-2 focus:ring-primary/40">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="open">Open</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
-                      <SelectItem value="done">Completed</SelectItem>
-                    </SelectContent>
-                  </Select>
+              {request.status.toLowerCase() === "closed" ? (
+                <p className="text-sm text-muted-foreground">This request is closed and cannot be modified.</p>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
+                  <div className="flex-1 sm:max-w-xs">
+                    <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                      <SelectTrigger className="h-10 focus:ring-2 focus:ring-primary/40">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="open">Open</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="closed">Closed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button 
+                    onClick={handleUpdateStatus} 
+                    disabled={updating || selectedStatus === request.status}
+                    className="w-full sm:w-auto h-10 disabled:opacity-50 disabled:pointer-events-none focus:ring-2 focus:ring-primary/40"
+                  >
+                    {updating ? "Updating..." : "Update Status"}
+                  </Button>
                 </div>
-                <Button 
-                  onClick={handleUpdateStatus} 
-                  disabled={updating || selectedStatus === request.status}
-                  className="w-full sm:w-auto h-10 disabled:opacity-50 disabled:pointer-events-none focus:ring-2 focus:ring-primary/40"
-                >
-                  {updating ? "Updating..." : "Update Status"}
-                </Button>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
