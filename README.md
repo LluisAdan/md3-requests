@@ -115,7 +115,7 @@ Make (escenarios de automatización opcionales)
 | Campo      | Tipo        | Descripción                                  |
 |------------|-------------|----------------------------------------------|
 | id         | uuid (PK)   | Identificador del log                         |
-| request_id | uuid (FK)   | Referencia a "requests.id"                    |
+| request_id | uuid (FK)   | Referencia a `requests.id`                    |
 | event      | text        | `REQUEST_CREATED`, `STATUS_CHANGED`, etc.     |
 | details    | jsonb       | Información adicional (public_id, source...)  |
 | created_at | timestamptz | Fecha y hora del evento                       |
