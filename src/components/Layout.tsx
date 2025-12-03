@@ -32,10 +32,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold uppercase">
-                    {(user?.email?.[0] || 'U').toUpperCase()}
+                  <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold uppercase">
+                    {((user?.user_metadata?.name || user?.email)?.[0] || 'U').toUpperCase()}
                   </div>
-                  <span className="text-sm text-muted-foreground">{user?.email?.split('@')[0] || 'Unknown'}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {user?.user_metadata?.name || user?.email?.split('@')[0] || 'Unknown'}
+                  </span>
                 </div>
                 <Button
                   variant="ghost" 
@@ -62,10 +64,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold uppercase">
-                    {(user?.email?.[0] || 'U').toUpperCase()}
+                  <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold uppercase">
+                    {((user?.user_metadata?.name || user?.email)?.[0] || 'U').toUpperCase()}
                   </div>
-                  <span className="text-xs text-muted-foreground">{user?.email?.split('@')[0] || 'Unknown'}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {user?.user_metadata?.name || user?.email?.split('@')[0] || 'Unknown'}
+                  </span>
                 </div>
                 <Button
                   variant="ghost" 
