@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, RotateCcw } from "lucide-react";
 import { getPriorityClasses, getStatusClasses, formatStatusLabel } from "@/lib/badge-styles";
 
 type Profile = {
@@ -229,7 +229,40 @@ const RequestDetail = () => {
             <div className="space-y-4">
               <h3 className="font-semibold text-lg text-foreground">Update Status</h3>
               {request.status.toLowerCase() === "closed" ? (
-                <p className="text-sm text-muted-foreground">This request is closed and cannot be modified.</p>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">This request is closed and cannot be modified.</p>
+                  <Button 
+                    variant="outline"
+                    onClick={async () => {
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (user && user.id !== request.created_by) {
+                        toast.error("Only the creator can reopen this request");
+                        return;
+                      }
+                      setUpdating(true);
+                      const { error } = await supabase
+                        .from("requests")
+                        .update({
+                          status: "in-progress",
+                          updated_at: new Date().toISOString(),
+                        })
+                        .eq("id", request.id);
+                      if (error) {
+                        toast.error("Failed to reopen request");
+                      } else {
+                        toast.success("Request reopened successfully");
+                        await fetchRequest();
+                        await fetchLogs();
+                      }
+                      setUpdating(false);
+                    }}
+                    disabled={updating}
+                    className="gap-2 h-10"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    {updating ? "Reopening..." : "Reopen Request"}
+                  </Button>
+                </div>
               ) : (
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
                   <div className="flex-1 sm:max-w-xs">

@@ -16,14 +16,14 @@ export const getPriorityClasses = (priority: string): string => {
 export const getStatusClasses = (status: string): string => {
   switch (status.toLowerCase()) {
     case "open":
-      return "bg-[#1A2B1A] text-[#4ADE80] border-[#4ADE80]/20";
+      return "bg-[#052e16] text-[#22c55e] border-[#22c55e]/30";
     case "in-progress":
-      return "bg-[#0F172A] text-[#60A5FA] border-[#60A5FA]/20";
+      return "bg-[#172554] text-[#3b82f6] border-[#3b82f6]/30";
     case "completed":
     case "done":
-      return "bg-[#1E1B4B] text-[#A78BFA] border-[#A78BFA]/20";
+      return "bg-[#2e1065] text-[#a855f7] border-[#a855f7]/30";
     case "closed":
-      return "bg-[#2C2C2C] text-[#A1A1AA] border-[#A1A1AA]/20";
+      return "bg-[#27272a] text-[#71717a] border-[#71717a]/30";
     default:
       return "bg-secondary text-secondary-foreground";
   }
