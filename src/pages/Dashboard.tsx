@@ -1,16 +1,16 @@
 import { Layout } from '@/components/Layout';
-import { FileText, Clock, AlertTriangle } from 'lucide-react';
+import { FileText, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 const STATUS_COLORS: Record<string, string> = {
-  open: '#4ADE80',
-  'in-progress': '#60A5FA',
-  completed: '#A78BFA',
-  done: '#A78BFA',
-  closed: '#A1A1AA',
+  open: '#22c55e',
+  'in-progress': '#3b82f6',
+  completed: '#a855f7',
+  done: '#a855f7',
+  closed: '#71717a',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -31,6 +31,7 @@ type StatusCount = {
 const Dashboard = () => {
   const [totalRequests, setTotalRequests] = useState<number | null>(null);
   const [openRequests, setOpenRequests] = useState<number | null>(null);
+  const [completedRequests, setCompletedRequests] = useState<number | null>(null);
   const [highPriorityRequests, setHighPriorityRequests] = useState<number | null>(null);
   const [statusData, setStatusData] = useState<StatusCount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,15 +40,17 @@ const Dashboard = () => {
     const fetchStats = async () => {
       setLoading(true);
       
-      const [totalRes, openRes, highRes, allRequests] = await Promise.all([
+      const [totalRes, openRes, completedRes, highRes, allRequests] = await Promise.all([
         supabase.from('requests').select('*', { count: 'exact', head: true }),
         supabase.from('requests').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+        supabase.from('requests').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
         supabase.from('requests').select('*', { count: 'exact', head: true }).eq('priority', 'high'),
         supabase.from('requests').select('status'),
       ]);
 
       setTotalRequests(totalRes.count ?? 0);
       setOpenRequests(openRes.count ?? 0);
+      setCompletedRequests(completedRes.count ?? 0);
       setHighPriorityRequests(highRes.count ?? 0);
 
       // Group by status
@@ -81,34 +84,51 @@ const Dashboard = () => {
           <p className="text-sm text-muted-foreground mt-1">Overview of your requests and activity</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="p-6 rounded-xl bg-[#0F172A] shadow-md space-y-2">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Total Requests</span>
-            </div>
-            <p className="text-3xl font-bold">
-              {loading ? '—' : totalRequests}
-            </p>
-          </div>
-          <div className="p-6 rounded-xl bg-[#0F172A] shadow-md space-y-2">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Open Requests</span>
-            </div>
-            <p className="text-3xl font-bold">
-              {loading ? '—' : openRequests}
-            </p>
-          </div>
-          <div className="p-6 rounded-xl bg-[#0F172A] shadow-md space-y-2">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">High Priority</span>
-            </div>
-            <p className="text-3xl font-bold">
-              {loading ? '—' : highPriorityRequests}
-            </p>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-[#0F172A] border-border/50 shadow-md">
+            <CardContent className="p-6 space-y-2">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Total Requests</span>
+              </div>
+              <p className="text-3xl font-bold">
+                {loading ? '—' : totalRequests}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-[#0F172A] border-border/50 shadow-md">
+            <CardContent className="p-6 space-y-2">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Open Requests</span>
+              </div>
+              <p className="text-3xl font-bold">
+                {loading ? '—' : openRequests}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-[#0F172A] border-border/50 shadow-md">
+            <CardContent className="p-6 space-y-2">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Completed</span>
+              </div>
+              <p className="text-3xl font-bold">
+                {loading ? '—' : completedRequests}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-[#0F172A] border-border/50 shadow-md">
+            <CardContent className="p-6 space-y-2">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">High Priority</span>
+              </div>
+              <p className="text-3xl font-bold">
+                {loading ? '—' : highPriorityRequests}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="mt-8">
@@ -123,7 +143,7 @@ const Dashboard = () => {
               ) : statusData.length === 0 ? (
                 <div className="h-64 flex items-center justify-center text-muted-foreground">No data available</div>
               ) : (
-                <div className="h-72">
+                <div className="h-80 flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -132,11 +152,9 @@ const Dashboard = () => {
                         nameKey="status"
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={2}
-                        label={({ status, count }) => `${STATUS_LABELS[status] || status}: ${count}`}
-                        labelLine={false}
+                        innerRadius={70}
+                        outerRadius={110}
+                        paddingAngle={3}
                       >
                         {statusData.map((entry) => (
                           <Cell 
