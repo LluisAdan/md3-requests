@@ -9,7 +9,7 @@ Diseñado como una herramienta real de uso interno para equipos de IT, soporte o
 ### 1. Autenticación y perfiles
 
 - Inicio de sesión y registro con **Supabase Auth**  
-- Tabla "profiles" sincronizada automáticamente con los usuarios  
+- Tabla `profiles` sincronizada automáticamente con los usuarios  
 - Guardado del nombre del usuario para mostrarlo en la UI  
 - Navbar con avatar (inicial) + nombre o email del usuario autenticado  
 
