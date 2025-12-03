@@ -57,8 +57,6 @@ const NewRequest = () => {
       toast.error('Failed to create request');
       console.error('Error creating request:', error);
     } else {
-      toast.success('Request created successfully');
-      
       try {
         await fetch('https://hook.eu2.make.com/5hdkgbq34m0q2w8nab4348s4mr5gkndo', {
           method: 'POST',
@@ -80,7 +78,7 @@ const NewRequest = () => {
         console.error('Webhook error:', webhookError);
       }
       
-      navigate(`/request/${data.id}`);
+      navigate(`/request/${data.id}`, { state: { created: true } });
     }
 
     setLoading(false);

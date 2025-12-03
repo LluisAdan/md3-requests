@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { supabase, Request, RequestLog } from "@/lib/supabase";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import { toast } from "sonner";
 import { ArrowLeft, Calendar, Clock, RotateCcw } from "lucide-react";
 import { getPriorityClasses, getStatusClasses, formatStatusLabel } from "@/lib/badge-styles";
 
@@ -25,6 +24,7 @@ type LogWithUser = RequestLog & {
 const RequestDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [request, setRequest] = useState<Request | null>(null);
   const [logs, setLogs] = useState<LogWithUser[]>([]);
   const [creator, setCreator] = useState<Profile | null>(null);
@@ -38,6 +38,13 @@ const RequestDetail = () => {
       fetchRequest();
       fetchLogs();
     }
+    // Check if we just created this request
+    if (location.state?.created) {
+      setNotification({ message: "Request created successfully", type: 'success' });
+      setTimeout(() => setNotification(null), 5000);
+      // Clear the state so it doesn't show again on refresh
+      window.history.replaceState({}, document.title);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -47,7 +54,6 @@ const RequestDetail = () => {
     const { data, error } = await supabase.from("requests").select("*").eq("id", id).single();
 
     if (error || !data) {
-      toast.error("Failed to fetch request");
       console.error("Error fetching request:", error);
       navigate("/");
       setLoading(false);
@@ -112,7 +118,8 @@ const RequestDetail = () => {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (user && user.id !== request.created_by) {
-      toast.error("Only the creator can modify the status");
+      setNotification({ message: "Only the creator can modify the status", type: 'error' });
+      setTimeout(() => setNotification(null), 5000);
       return;
     }
 
@@ -121,6 +128,7 @@ const RequestDetail = () => {
       .from("requests")
       .update({
         status: selectedStatus,
+        assigned_to: user?.id,
         updated_at: new Date().toISOString(),
       })
       .eq("id", request.id);
@@ -236,7 +244,8 @@ const RequestDetail = () => {
                     onClick={async () => {
                       const { data: { user } } = await supabase.auth.getUser();
                       if (user && user.id !== request.created_by) {
-                        toast.error("Only the creator can reopen this request");
+                        setNotification({ message: "Only the creator can reopen this request", type: 'error' });
+                        setTimeout(() => setNotification(null), 5000);
                         return;
                       }
                       setUpdating(true);
@@ -244,17 +253,19 @@ const RequestDetail = () => {
                         .from("requests")
                         .update({
                           status: "in-progress",
+                          assigned_to: user?.id,
                           updated_at: new Date().toISOString(),
                         })
                         .eq("id", request.id);
                       if (error) {
-                        toast.error("Failed to reopen request");
+                        setNotification({ message: "Failed to reopen request", type: 'error' });
                       } else {
-                        toast.success("Request reopened successfully");
+                        setNotification({ message: "Request reopened successfully", type: 'success' });
                         await fetchRequest();
                         await fetchLogs();
                       }
                       setUpdating(false);
+                      setTimeout(() => setNotification(null), 5000);
                     }}
                     disabled={updating}
                     className="gap-2 h-10"
