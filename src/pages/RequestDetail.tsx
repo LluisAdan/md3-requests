@@ -114,7 +114,7 @@ const RequestDetail = () => {
   };
 
   const handleUpdateStatus = async () => {
-    if (!request || !selectedStatus) return;
+    if (!request || !selectedStatus || selectedStatus === request.status) return;
 
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -132,6 +132,17 @@ const RequestDetail = () => {
       setNotification({ message: "Failed to update status", type: 'error' });
       console.error("Error updating status:", error);
     } else {
+      // Insert log entry for status change
+      await supabase.from("request_logs").insert({
+        request_id: request.id,
+        event: "STATUS_CHANGED",
+        details: {
+          old_status: request.status,
+          new_status: selectedStatus,
+          changed_by: user?.id,
+        },
+      });
+
       setNotification({ message: "Status updated successfully", type: 'success' });
       await fetchRequest();
       await fetchLogs();
@@ -250,6 +261,16 @@ const RequestDetail = () => {
                       if (error) {
                         setNotification({ message: "Failed to reopen request", type: 'error' });
                       } else {
+                        // Insert log entry for reopen
+                        await supabase.from("request_logs").insert({
+                          request_id: request.id,
+                          event: "STATUS_CHANGED",
+                          details: {
+                            old_status: request.status,
+                            new_status: "in-progress",
+                            changed_by: user?.id,
+                          },
+                        });
                         setNotification({ message: "Request reopened successfully", type: 'success' });
                         await fetchRequest();
                         await fetchLogs();
