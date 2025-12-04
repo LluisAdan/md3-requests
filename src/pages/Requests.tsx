@@ -71,12 +71,15 @@ const Requests = () => {
       
       // Sort based on selected option
       const priorityOrder: Record<string, number> = { high: 1, medium: 2, low: 3 };
-      const sorted = requestsWithAssigned.sort((a, b) => {
+      const sorted = [...requestsWithAssigned].sort((a, b) => {
+        // First, separate closed items to the bottom
         const aIsClosed = a.status.toLowerCase() === "closed";
         const bIsClosed = b.status.toLowerCase() === "closed";
-        if (aIsClosed && !bIsClosed) return 1;
-        if (!aIsClosed && bIsClosed) return -1;
+        if (aIsClosed !== bIsClosed) {
+          return aIsClosed ? 1 : -1;
+        }
 
+        // Then apply the selected sort
         if (sortBy === "date-desc") {
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         } else if (sortBy === "date-asc") {
