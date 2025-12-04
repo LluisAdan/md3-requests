@@ -78,9 +78,6 @@ Supabase
   - Auth
   - Postgres (requests, profiles, request_logs)
   - RLS (Row Level Security)
-      │
-      ▼
-Make (escenarios de automatización opcionales)
 
 
 ## Modelo de datos (Supabase)
