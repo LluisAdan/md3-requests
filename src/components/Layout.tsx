@@ -26,7 +26,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
                     <Inbox className="h-5 w-5 text-white" />
                   </div>
-                  <span className="text-xl font-semibold text-foreground">Internal Requests Portal</span>
+                  <span className="text-xl font-semibold text-foreground">md3Requests</span>
                 </div>
               </div>
 
