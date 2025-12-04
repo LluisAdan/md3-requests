@@ -120,7 +120,7 @@ const RequestDetail = () => {
 
     // Check if user is the creator
     if (user?.id !== request.created_by) {
-      setNotification({ message: "Solo puede modificar el creador de la incidencia", type: 'error' });
+      setNotification({ message: "Only the creator can modify this request", type: 'error' });
       setTimeout(() => setNotification(null), 5000);
       return;
     }
@@ -136,7 +136,7 @@ const RequestDetail = () => {
       .eq("id", request.id);
 
     if (error) {
-      setNotification({ message: "Solo puede modificar el creador de la incidencia", type: 'error' });
+      setNotification({ message: "Only the creator can modify this request", type: 'error' });
       console.error("Error updating status:", error);
     } else {
       setNotification({ message: "Status updated successfully", type: 'success' });
@@ -248,7 +248,7 @@ const RequestDetail = () => {
                       
                       // Check if user is the creator
                       if (user?.id !== request.created_by) {
-                        setNotification({ message: "Solo puede modificar el creador de la incidencia", type: 'error' });
+                        setNotification({ message: "Only the creator can modify this request", type: 'error' });
                         setTimeout(() => setNotification(null), 5000);
                         return;
                       }
@@ -263,7 +263,7 @@ const RequestDetail = () => {
                         })
                         .eq("id", request.id);
                       if (error) {
-                        setNotification({ message: "Solo puede modificar el creador de la incidencia", type: 'error' });
+                        setNotification({ message: "Only the creator can modify this request", type: 'error' });
                       } else {
                         setNotification({ message: "Request reopened successfully", type: 'success' });
                         await fetchRequest();
