@@ -118,6 +118,13 @@ const RequestDetail = () => {
 
     const { data: { user } } = await supabase.auth.getUser();
 
+    // Check if user is the creator
+    if (user?.id !== request.created_by) {
+      setNotification({ message: "Solo puede modificar el creador de la incidencia", type: 'error' });
+      setTimeout(() => setNotification(null), 5000);
+      return;
+    }
+
     setUpdating(true);
     const { error } = await supabase
       .from("requests")
@@ -129,7 +136,7 @@ const RequestDetail = () => {
       .eq("id", request.id);
 
     if (error) {
-      setNotification({ message: "Failed to update status", type: 'error' });
+      setNotification({ message: "Solo puede modificar el creador de la incidencia", type: 'error' });
       console.error("Error updating status:", error);
     } else {
       setNotification({ message: "Status updated successfully", type: 'success' });
@@ -238,6 +245,14 @@ const RequestDetail = () => {
                     variant="outline"
                     onClick={async () => {
                       const { data: { user } } = await supabase.auth.getUser();
+                      
+                      // Check if user is the creator
+                      if (user?.id !== request.created_by) {
+                        setNotification({ message: "Solo puede modificar el creador de la incidencia", type: 'error' });
+                        setTimeout(() => setNotification(null), 5000);
+                        return;
+                      }
+                      
                       setUpdating(true);
                       const { error } = await supabase
                         .from("requests")
@@ -248,7 +263,7 @@ const RequestDetail = () => {
                         })
                         .eq("id", request.id);
                       if (error) {
-                        setNotification({ message: "Failed to reopen request", type: 'error' });
+                        setNotification({ message: "Solo puede modificar el creador de la incidencia", type: 'error' });
                       } else {
                         setNotification({ message: "Request reopened successfully", type: 'success' });
                         await fetchRequest();
