@@ -338,37 +338,23 @@ const RequestDetail = () => {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                         <div className="space-y-2">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                            <p className="font-semibold text-sm text-foreground">
-                              {log.event}
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-sm text-foreground uppercase tracking-wide">
+                                {log.event.replace(/_/g, ' ')}
+                              </span>
                               {log.event === "STATUS_CHANGED" && log.details?.new_status && (
-                                <span className="ml-2 font-normal text-muted-foreground">
+                                <span className="flex items-center gap-1 text-muted-foreground">
                                   → <Badge className={`text-xs border ${getStatusClasses(log.details.new_status)}`}>
                                     {formatStatusLabel(log.details.new_status)}
                                   </Badge>
                                 </span>
                               )}
-                            </p>
+                            </div>
                             <span className="text-xs text-muted-foreground sm:hidden">
                               {format(new Date(log.created_at), "MMM d, h:mm a")}
                               {log.changedByName && ` · by ${log.changedByName}`}
                             </span>
                           </div>
-                          {log.details && (
-                            <div className="text-sm text-muted-foreground space-y-1">
-                              {log.details.public_id && (
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">ID:</span>
-                                  <span className="font-mono">#{log.details.public_id}</span>
-                                </div>
-                              )}
-                              {log.details.source && (
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">Source:</span>
-                                  <span>{log.details.source}</span>
-                                </div>
-                              )}
-                            </div>
-                          )}
                         </div>
                         <div className="text-xs text-muted-foreground whitespace-nowrap hidden sm:flex sm:flex-col sm:items-end gap-0.5">
                           <span>{format(new Date(log.created_at), "MMM d, h:mm a")}</span>
