@@ -24,11 +24,12 @@ const Requests = () => {
   const [requests, setRequests] = useState<RequestWithAssigned[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("date-desc");
   const [activeTab, setActiveTab] = useState<string>("all");
 
   useEffect(() => {
     fetchRequests();
-  }, [statusFilter, activeTab]);
+  }, [statusFilter, activeTab, sortBy]);
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -68,13 +69,24 @@ const Requests = () => {
         })
       );
       
-      // Sort: non-closed first (by created_at desc), then closed (by created_at desc)
+      // Sort based on selected option
+      const priorityOrder: Record<string, number> = { high: 1, medium: 2, low: 3 };
       const sorted = requestsWithAssigned.sort((a, b) => {
         const aIsClosed = a.status.toLowerCase() === "closed";
         const bIsClosed = b.status.toLowerCase() === "closed";
         if (aIsClosed && !bIsClosed) return 1;
         if (!aIsClosed && bIsClosed) return -1;
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+
+        if (sortBy === "date-desc") {
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        } else if (sortBy === "date-asc") {
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        } else if (sortBy === "priority-high") {
+          return (priorityOrder[a.priority] || 4) - (priorityOrder[b.priority] || 4);
+        } else if (sortBy === "priority-low") {
+          return (priorityOrder[b.priority] || 4) - (priorityOrder[a.priority] || 4);
+        }
+        return 0;
       });
       setRequests(sorted);
     }
@@ -187,18 +199,32 @@ const Requests = () => {
             <p className="text-sm text-muted-foreground mt-1">View and manage internal requests</p>
           </div>
 
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[180px] h-10 focus:ring-2 focus:ring-primary/40">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="in-progress">In Progress</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-[180px] h-10 focus:ring-2 focus:ring-primary/40">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="in-progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-full sm:w-[180px] h-10 focus:ring-2 focus:ring-primary/40">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date-desc">Newest first</SelectItem>
+                <SelectItem value="date-asc">Oldest first</SelectItem>
+                <SelectItem value="priority-high">Priority: High → Low</SelectItem>
+                <SelectItem value="priority-low">Priority: Low → High</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
