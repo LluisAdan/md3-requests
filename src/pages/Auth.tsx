@@ -136,7 +136,7 @@ const Auth = () => {
                     <Input
                       id="signin-email"
                       type="email"
-                      placeholder="name@company.com"
+                      placeholder="demo@md3-requests.com"
                       value={signInForm.email}
                       onChange={(e) => setSignInForm({ ...signInForm, email: e.target.value })}
                       required
