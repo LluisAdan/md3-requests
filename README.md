@@ -133,7 +133,7 @@ El proyecto utiliza **Row Level Security** en Supabase.
 
 ## Demo online
 
-https://requests-portal.lovable.app
+https://md3-requests.lovable.app
 
 
 ## Ejecución local (si se exporta el código)
