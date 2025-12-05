@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Inbox, LayoutDashboard, FileText, Plus } from 'lucide-react';
+import { LogOut, LayoutDashboard, FileText, Plus } from 'lucide-react';
+import logo from '@/assets/logo.png';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { NavLink } from './NavLink';
@@ -23,9 +24,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="h-10 w-10" />
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
-                    <Inbox className="h-5 w-5 text-white" />
-                  </div>
+                  <img src={logo} alt="md3Requests Logo" className="h-9 w-9 object-contain" />
                   <span className="text-xl font-semibold text-foreground">md3Requests</span>
                 </div>
               </div>
@@ -56,10 +55,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <header className="md:hidden border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 shadow-sm">
-                  <Inbox className="h-4 w-4 text-white" />
-                </div>
-                <span className="text-sm sm:text-base font-semibold text-foreground truncate">Requests Portal</span>
+                <img src={logo} alt="md3Requests Logo" className="h-8 w-8 object-contain flex-shrink-0" />
+                <span className="text-sm sm:text-base font-semibold text-foreground truncate">md3Requests</span>
               </div>
 
               <div className="flex items-center gap-2">
