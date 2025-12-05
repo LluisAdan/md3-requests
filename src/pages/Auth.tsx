@@ -7,8 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Inbox } from "lucide-react";
-import { supabase } from "@/lib/supabase"; // 👈 añadido
+import { supabase } from "@/lib/supabase";
+import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const { user, loading, signIn } = useAuth(); // 👈 ya no usamos signUp del contexto aquí
@@ -108,11 +108,9 @@ const Auth = () => {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center gap-4 mb-8">
-          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
-            <Inbox className="h-8 w-8 text-white" />
-          </div>
+          <img src={logo} alt="md3Requests Logo" className="h-16 w-16 object-contain" />
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground">Requests Portal</h1>
+            <h1 className="text-3xl font-bold text-foreground">md3Requests</h1>
             <p className="text-muted-foreground mt-1">Manage internal requests efficiently</p>
           </div>
         </div>
