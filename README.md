@@ -1,76 +1,55 @@
 # md3-requests — Portal Interno de Solicitudes
 
-Sistema moderno de gestión de incidencias y solicitudes internas, construido con **Supabase**, **Lovable (React)** y **Make** para automatizaciones.  
-Diseñado como una herramienta real de uso interno para equipos de IT, soporte o automatización.
+Sistema moderno de gestión de incidencias y solicitudes internas, construido con **Supabase** y **Lovable (React)**.
+Diseñado como herramienta real para equipos de IT/soporte/automatización.
+
+> **Demo:** [https://md3-requests.lovable.app](https://md3-requests.lovable.app)
+> **Credenciales demo:**
+> Usuario: `demo@md3-requests.com`
+> Contraseña: `Demo1234!`
+> *(Perfil con nombre “Demo”; datos de prueba incluidos.)*
 
 
 ## Funcionalidades principales
 
-### 1. Autenticación y perfiles
+### 1) Autenticación y perfiles
 
-- Inicio de sesión y registro con **Supabase Auth**  
-- Tabla `profiles` sincronizada automáticamente con los usuarios  
-- Guardado del nombre del usuario para mostrarlo en la UI  
-- Navbar con avatar (inicial) + nombre o email del usuario autenticado  
+* Login con **Supabase Auth**.
+* Tabla `profiles` enlazada a `auth.users` (muestra **nombre** del creador en la UI).
+* Navbar con avatar (inicial) + nombre/email del usuario autenticado.
 
-### 2. Gestión de solicitudes
+### 2) Gestión de solicitudes
 
-- Creación de nuevas incidencias con:
-  - Título  
-  - Descripción  
-  - Tipo  
-  - Prioridad  
-- Flujo completo de estados:
-  - `open`
-  - `in-progress`
-  - `completed`  
-  - `closed` (estado final bloqueado, no editable desde el selector)  
-- Botón **Reopen** cuando una solicitud cerrada necesita reabrirse  
-- Vista de detalle con toda la información organizada (metadatos, creador, descripción, etc.)
+* Crear solicitud con **título, descripción, tipo, prioridad**.
+* Flujo de estados:
 
+  * `open`, `in-progress`, `completed`, `closed`
+* **`closed`**: estado final **bloqueado** (no editable en selector); botón **Reopen** para reabrir.
+* Listado **ordena `closed` al final** automáticamente.
 
-### 3. Auditoría completa (activity logs)
+### 3) Auditoría (activity logs)
 
-Todas las acciones importantes quedan registradas en la tabla `request_logs`:
+* Tabla `request_logs` registra:
 
-- `REQUEST_CREATED`
-- `STATUS_CHANGED`
-- Fecha, hora, usuario y detalles de la acción  
-- Visualización en **timeline vertical** dentro del detalle de la solicitud
+  * `REQUEST_CREATED`, `STATUS_CHANGED`, fecha/hora, usuario y detalles.
+* Visualización en **timeline vertical** en el detalle.
 
-Esto da un nivel profesional de trazabilidad similar al de herramientas internas reales.
+### 4) Dashboard
 
+* KPIs: **totales**, **abiertas**, **alta prioridad**.
+* **Gráfico donut** por estado: open / in-progress / completed / closed.
 
-### 4. Dashboard con métricas
+### 5) UI/UX (dark, responsive)
 
-Panel con tarjetas de KPI calculadas en tiempo real desde Supabase:
-
-- Solicitudes totales  
-- Solicitudes abiertas  
-- Solicitudes completadas  
-- Solicitudes de prioridad alta  
-
-Además, un **gráfico tipo donut** muestra la distribución por estado:
-
-- `open` 
-- `in-progress`
-- `completed`
-- `closed`
+* Estética SaaS oscura, consistente.
+* Badges por **estado** y **prioridad**.
+* Responsive (sidebar en desktop / topbar en móvil).
+* Tablas con scroll cuando procede.
 
 
-### 5. UI/UX moderna (dark mode corporativo)
+## Arquitectura
 
-Construido visualmente con Lovable manteniendo un estándar profesional:
-
-- Estética dark moderna estilo SaaS  
-- Badges personalizados por estado y prioridad  
-- Diseño responsive (sidebar en escritorio, topbar en móvil)  
-- Scroll horizontal en tablas cuando es necesario  
-- Componentes UI consistentes (cards, badges, select, timeline, etc.)
-
-
-## Arquitectura del proyecto
-
+```text
 Frontend (Lovable / React)
       │
       ▼
@@ -78,95 +57,91 @@ Supabase
   - Auth
   - Postgres (requests, profiles, request_logs)
   - RLS (Row Level Security)
+```
+
+> **Automatizaciones (opcional/futuro):** el proyecto está preparado para integrarse con Make/Slack/Email, pero **no** se incluye en esta versión.
 
 
-## Modelo de datos (Supabase)
+## 🗃️ Modelo de datos (Supabase)
 
-### Tabla: `requests`
+### `requests`
 
-| Campo       | Tipo        | Descripción                                      |
-|------------|-------------|--------------------------------------------------|
-| id         | uuid (PK)   | Identificador interno autogenerado               |
-| public_id  | text        | ID legible tipo `REQ-2025-XXXX`                  |
-| title      | text        | Título de la solicitud                           |
-| description| text        | Descripción completa                             |
-| type       | text        | Categoría / tipo de solicitud                    |
-| priority   | text        | `low` / `medium` / `high`                        |
-| status     | text        | `open` / `in-progress` / `completed` / `closed`  |
-| created_by | uuid (FK)   | Referencia a `profiles.id`                       |
-| created_at | timestamptz | Fecha de creación                                |
-| updated_at | timestamptz | Fecha de última actualización                    |
+| Campo       | Tipo        | Descripción                                     |
+| ----------- | ----------- | ----------------------------------------------- |
+| id          | uuid (PK)   | Identificador interno                           |
+| public_id   | text        | ID legible tipo `REQ-2025-XXXX`                 |
+| title       | text        | Título                                          |
+| description | text        | Descripción                                     |
+| type        | text        | `feature` / `support` / `bug` / `other`         |
+| priority    | text        | `low` / `medium` / `high`                       |
+| status      | text        | `open` / `in-progress` / `completed` / `closed` |
+| created_by  | uuid (FK)   | → `profiles.id`                                 |
+| created_at  | timestamptz | Creación                                        |
+| updated_at  | timestamptz | Última actualización                            |
 
+### `profiles`
 
-### Tabla: `profiles`
+| Campo | Tipo      | Descripción                   |
+| ----- | --------- | ----------------------------- |
+| id    | uuid (PK) | **Igual que `auth.users.id`** |
+| email | text      | Email                         |
+| name  | text      | Nombre visible en UI          |
 
-| Campo | Tipo        | Descripción                                   |
-|-------|-------------|-----------------------------------------------|
-| id    | uuid (PK)   | Igual que `auth.users.id`                     |
-| email | text        | Email del usuario                             |
-| name  | text        | Nombre para mostrar en la interfaz            |
+### `request_logs`
 
-
-### Tabla: `request_logs`
-
-| Campo      | Tipo        | Descripción                                  |
-|------------|-------------|----------------------------------------------|
-| id         | uuid (PK)   | Identificador del log                         |
-| request_id | uuid (FK)   | Referencia a `requests.id`                    |
-| event      | text        | `REQUEST_CREATED`, `STATUS_CHANGED`, etc.     |
-| details    | jsonb       | Información adicional (public_id, source...)  |
-| created_at | timestamptz | Fecha y hora del evento                       |
+| Campo      | Tipo        | Descripción                            |
+| ---------- | ----------- | -------------------------------------- |
+| id         | uuid (PK)   | Identificador                          |
+| request_id | uuid (FK)   | → `requests.id`                        |
+| event      | text        | `REQUEST_CREATED`, `STATUS_CHANGED`, … |
+| details    | jsonb       | Extra (p.ej. `public_id`, `source`)    |
+| created_at | timestamptz | Fecha/hora                             |
 
 
 ## Seguridad (RLS)
 
-El proyecto utiliza **Row Level Security** en Supabase.
+* **`profiles`**
 
-### En `profiles`:
-- Los usuarios solo pueden leer/actualizar su propio perfil.  
-- Se permite leer los perfiles de otros usuarios para poder mostrar el nombre del creador en las solicitudes (sin exponer datos sensibles).
+  * Los usuarios **leen/actualizan solo su perfil**.
+  * Se permite leer perfiles necesarios para mostrar el nombre del creador en las solicitudes (solo campos no sensibles).
 
-### En `requests`:
-- Los usuarios autenticados pueden ver las solicitudes (modelo típico de herramienta interna).  
-- La lógica de bloqueo cuando "status = closed" se aplica desde la UI (no editable desde el selector; solo reabrible con botón dedicado).
+* **`requests`**
 
+  * Usuarios autenticados pueden **ver** solicitudes (modelo típico interno).
+  * La lógica de bloqueo de `closed` se aplica en la **UI** (no editable en selector; reabrible con botón).
 
-## Demo online
-
-https://md3-requests.lovable.app
+> Nota: si exportas el proyecto y quieres endurecer reglas (p.ej. impedir updates en `closed` desde SQL), puedes añadir una policy `FOR UPDATE` que deniegue cambios cuando `status = 'closed'`.
 
 
-## Ejecución local (si se exporta el código)
-
-Si en algún momento migras a un proyecto React estándar:
+## Ejecución local (si exportas el código)
 
 ```bash
 npm install
 npm run dev
-export VITE_SUPABASE_URL=tu_url
-export VITE_SUPABASE_ANON_KEY=tu_anon_key
 ```
 
-## Automatizaciones con Make (idea general)
+Variables de entorno necesarias:
 
-Este portal está preparado para integrarse con escenarios de Make, por ejemplo:
-- Enviar un email al creador al crear una solicitud.
-- Notificar en Slack/Teams cuando una solicitud de prioridad alta pasa a in-progress.
-- Enviar resúmenes diarios/semanales de solicitudes abiertas.
-- Registrar logs o métricas adicionales fuera de la app.
+```bash
+# .env.local (Vite)
+VITE_SUPABASE_URL=tu_url
+VITE_SUPABASE_ANON_KEY=tu_anon_key
+```
+
+> **Privadas** (no subir a Git): claves **service-role / secret** de Supabase son **solo para backend**. En frontend usa **ANON/PUBLISHABLE**.
 
 
-## Mejoras futuras (roadmap)
+## Roadmap corto
 
-- Sistema de roles (admin / agente / solicitante).
-- Campo assigned_to con permisos según rol.
-- Adjuntos de archivos.
-- SLA y recordatorios automáticos.
-- Búsqueda avanzada y filtros guardados.
-- Multi-tenant (varias empresas/unidades).
-- Integración con Jira / Linear.
+* Roles (`admin` / `agent` / `requester`) y `assigned_to`.
+* Adjuntos de archivos.
+* SLA y recordatorios automáticos.
+* Búsqueda avanzada y filtros guardados.
+* Multi-tenant.
+* Integraciones (Jira / Linear / Slack / Email) mediante Make o funciones.
+
 
 ## Autor
 
-Lluís Adán — Desarrollador de automatización e internal tools.  
-https://linkedin.com/in/lluis-adan
+Lluís Adán — Desarrollador de automatización e internal tools
+[https://linkedin.com/in/lluis-adan](https://linkedin.com/in/lluis-adan)
