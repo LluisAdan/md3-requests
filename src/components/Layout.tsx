@@ -1,7 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, LayoutDashboard, FileText, Plus } from 'lucide-react';
-import logo from '@/assets/logo.png';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { NavLink } from './NavLink';
@@ -24,7 +23,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="h-10 w-10" />
                 <div className="flex items-center gap-3">
-                  <img src={logo} alt="md3Requests Logo" className="h-9 w-9 object-contain" />
+                  <img src="/logo.png" alt="md3Requests Logo" className="h-9 w-9 object-contain" loading="eager" fetchPriority="high" />
                   <span className="text-xl font-semibold text-foreground">md3Requests</span>
                 </div>
               </div>
@@ -55,7 +54,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <header className="md:hidden border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-2 min-w-0">
-                <img src={logo} alt="md3Requests Logo" className="h-8 w-8 object-contain flex-shrink-0" />
+                <img src="/logo.png" alt="md3Requests Logo" className="h-8 w-8 object-contain flex-shrink-0" loading="eager" fetchPriority="high" />
                 <span className="text-sm sm:text-base font-semibold text-foreground truncate">md3Requests</span>
               </div>
 
